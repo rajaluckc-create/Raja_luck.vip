@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Safe - Raja Luck VIP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f7f8fc; color: #333; padding-bottom: 50px; }
+
+        /* HEADER */
+        .header { background: white; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .header i { position: absolute; left: 15px; font-size: 20px; cursor: pointer; padding: 5px; color: #333; }
+        .header-title { font-size: 18px; font-weight: bold; color: #333; }
+
+        .container { padding: 15px; }
+
+        /* INTEREST RATE BADGE */
+        .rate-badge-container { display: flex; justify-content: center; margin-top: 10px; margin-bottom: 20px; }
+        .rate-badge { background: white; color: #ff4757; font-size: 12px; font-weight: bold; padding: 6px 25px; border-radius: 20px; box-shadow: 0 2px 8px rgba(255, 71, 87, 0.15); border: 1px solid #ffcad1;}
+
+        /* RED SAFE CARD */
+        .safe-card { background: linear-gradient(135deg, #ff6b81, #ff4757); border-radius: 15px; padding: 20px; color: white; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(255, 71, 87, 0.3); position: relative; overflow: hidden; }
+        .safe-card::after { content: '**** ****'; position: absolute; bottom: 15px; right: 20px; font-size: 16px; opacity: 0.5; letter-spacing: 2px;}
+        
+        .sc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .sc-title { font-size: 13px; display: flex; align-items: center; gap: 5px; font-weight: bold;}
+        .sc-title i { color: #f1c40f; font-size: 16px; }
+        .sc-shield { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 5px; border: 1px solid rgba(255,255,255,0.3); }
+        
+        .sc-amount { font-size: 32px; font-weight: 900; margin-bottom: 15px; }
+        .sc-desc { font-size: 11px; opacity: 0.9; }
+
+        /* STATS BOXES */
+        .stats-row { display: flex; background: white; border-radius: 12px; padding: 15px 0; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .stat-box { flex: 1; text-align: center; border-right: 1px solid #f1f2f6; }
+        .stat-box:last-child { border-right: none; }
+        .stat-val { font-size: 18px; font-weight: bold; color: #ff4757; margin-bottom: 5px; }
+        .stat-label { font-size: 11px; color: #747d8c; line-height: 1.4; }
+
+        /* ACTION BUTTONS */
+        .btn-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn { flex: 1; padding: 14px; border-radius: 8px; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.2s; }
+        .btn:active { transform: scale(0.97); }
+        .btn-out { background: white; border: 1px solid #ff4757; color: #ff4757; }
+        .btn-in { background: #ff4757; border: 1px solid #ff4757; color: white; box-shadow: 0 4px 10px rgba(255, 71, 87, 0.2); }
+
+        .note-text { text-align: center; font-size: 10px; color: #ff4757; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 5px;}
+        .learn-more { text-align: center; font-size: 12px; color: #a4b0be; text-decoration: underline; margin-bottom: 30px; }
+
+        /* HISTORY SECTION */
+        .history-title { font-size: 15px; font-weight: bold; color: #2f3542; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .history-title i { color: #ff4757; background: rgba(255, 71, 87, 0.1); padding: 5px; border-radius: 5px; }
+        .btn-history { width: 100%; background: white; border: 1px solid #ffcad1; color: #ff4757; padding: 12px; border-radius: 30px; font-size: 14px; font-weight: bold; cursor: pointer; }
+
+        /* MODALS FOR TRANSFER */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+        .modal-box { background: white; width: 90%; border-radius: 15px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: popIn 0.3s ease; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .m-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333; text-align: center; }
+        .m-bal-info { font-size: 12px; color: #747d8c; margin-bottom: 15px; text-align: center; }
+        .m-bal-info strong { color: #ff4757; font-size: 14px; }
+        
+        .m-input { width: 100%; padding: 12px 15px; border: 1px solid #dfe4ea; border-radius: 8px; font-size: 16px; font-weight: bold; outline: none; margin-bottom: 20px; }
+        .m-input:focus { border-color: #ff4757; }
+        
+        .m-btn-row { display: flex; gap: 10px; }
+        .m-btn { flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; }
+        .m-btn-cancel { background: #f1f2f6; color: #747d8c; }
+        .m-btn-confirm { background: #ff4757; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="window.location.href='my.html'"></i>
+        <div class="header-title">सुरक्षित</div>
+    </div>
+
+    <div class="rate-badge-container">
+        <div class="rate-badge">ब्याज दर 0.1%</div>
+    </div>
+
+    <div class="container">
+        
+        <div class="safe-card">
+            <div class="sc-top">
+                <div class="sc-title"><i class="fas fa-coins"></i> कुल मिलाकर</div>
+                <div class="sc-shield"><i class="fas fa-shield-alt"></i> वित्तीय सुरक्षा</div>
+            </div>
+            <div class="sc-amount">₹<span id="safeBalTxt">0.00</span></div>
+            <div class="sc-desc">1 मिलियन ट्रांसफर करें, रोजाना 1000 प्राप्त करें</div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-val">₹<span id="todayEarnTxt">0.00</span></div>
+                <div class="stat-label">उत्पन्न परिणाम<br><span style="font-size:9px; font-weight:bold;">मेरी दर 0.1%</span></div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val">₹<span id="totalEarnTxt">0.00</span></div>
+                <div class="stat-label">संचित आय</div>
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn btn-out" onclick="openModal('out')">घर छोड़ देना</button>
+            <button class="btn btn-in" onclick="openModal('in')">में स्थानांतरित</button>
+        </div>
+
+        <div class="note-text">
+            <i class="fas fa-exclamation-circle"></i> फंड सुरक्षित और सुरक्षित हैं, और किसी भी समय स्थानांतरित किए जा सकते हैं
+        </div>
+
+        <div class="learn-more">तिजोरियों के बारे में जानें »</div>
+
+        <div class="history-title"><i class="fas fa-list-alt"></i> ऐतिहासिक रिकॉर्ड</div>
+        <button class="btn-history" onclick="alert('No safe records yet.')">सारे रिकॉर्ड</button>
+
+    </div>
+
+    <div class="modal-overlay" id="transferModal">
+        <div class="modal-box">
+            <div class="m-title" id="mTitle">Transfer</div>
+            <div class="m-bal-info" id="mBalInfo">Available Balance: <strong>₹0.00</strong></div>
+            
+            <input type="number" id="mInputAmt" class="m-input" placeholder="Enter Amount (₹)">
+            
+            <div class="m-btn-row">
+                <button class="m-btn m-btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="m-btn m-btn-confirm" id="mConfirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- VARIABLES ---
+        var mainBal = Number(localStorage.getItem('r_bal') || 0);
+        var safeBal = Number(localStorage.getItem('r_safe_bal') || 0);
+        var safeAccumulated = Number(localStorage.getItem('r_safe_earn') || 0);
+        var lastCalcTime = Number(localStorage.getItem('r_safe_time') || Date.now());
+
+        var currentMode = ""; // 'in' or 'out'
+
+        // --- INTEREST CALCULATION (0.1% Daily simulated per minute) ---
+        function calculateInterest() {
+            if(safeBal > 0) {
+                var now = Date.now();
+                var diffMs = now - lastCalcTime;
+                var diffMins = diffMs / 60000; // minutes passed
+                
+                // 0.1% per day = (0.001 / 24 / 60) per minute
+                var interestPerMin = safeBal * (0.001 / 1440);
+                var earnedNow = interestPerMin * diffMins;
+
+                if(earnedNow > 0) {
+                    safeAccumulated += earnedNow;
+                    safeBal += earnedNow; // Compound interest (adds to safe)
+                    
+                    localStorage.setItem('r_safe_earn', safeAccumulated);
+                    localStorage.setItem('r_safe_bal', safeBal);
+                    localStorage.setItem('r_safe_time', now);
+                    lastCalcTime = now;
+                }
+            } else {
+                // If safe is empty, just update timer so it doesn't calculate massive interest later
+                localStorage.setItem('r_safe_time', Date.now());
+                lastCalcTime = Date.now();
+            }
+        }
+
+        // --- UI UPDATES ---
+        function updateUI() {
+            calculateInterest(); // Calc before showing
+            document.getElementById("safeBalTxt").innerText = safeBal.toFixed(2);
+            document.getElementById("totalEarnTxt").innerText = safeAccumulated.toFixed(2);
+            // Simulate today's earn (just showing a fraction for realism)
+            document.getElementById("todayEarnTxt").innerText = (safeAccumulated > 0 ? (safeAccumulated * 0.4).toFixed(2) : "0.00");
+        }
+
+        // --- MODAL LOGIC ---
+        function openModal(mode) {
+            currentMode = mode;
+            var modal = document.getElementById("transferModal");
+            var title = document.getElementById("mTitle");
+            var info = document.getElementById("mBalInfo");
+            var input = document.getElementById("mInputAmt");
+            var btn = document.getElementById("mConfirmBtn");
+
+            input.value = ""; // clear input
+
+            if(mode === 'in') {
+                title.innerText = "में स्थानांतरित (Transfer IN)";
+                info.innerHTML = `Main Wallet Balance: <strong>₹${mainBal.toFixed(2)}</strong>`;
+                btn.onclick = function() { processTransfer('in'); };
+            } else {
+                title.innerText = "घर छोड़ देना (Transfer OUT)";
+                info.innerHTML = `Safe Balance: <strong>₹${safeBal.toFixed(2)}</strong>`;
+                btn.onclick = function() { processTransfer('out'); };
+            }
+
+            modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("transferModal").style.display = "none";
+        }
+
+        function processTransfer(mode) {
+            var amt = Number(document.getElementById("mInputAmt").value);
+            
+            if(amt <= 0 || isNaN(amt)) {
+                alert("Please enter a valid amount!");
+                return;
+            }
+
+            if(mode === 'in') {
+                if(amt > mainBal) { alert("Insufficient Main Wallet Balance!"); return; }
+                
+                // Deduct from main, add to safe
+                mainBal -= amt;
+                safeBal += amt;
+                
+                localStorage.setItem('r_bal', mainBal);
+                localStorage.setItem('r_safe_bal', safeBal);
+                localStorage.setItem('r_safe_time', Date.now()); // Reset timer on new deposit
+                
+                alert(`₹${amt} transferred to Safe successfully!`);
+                
+            } else if(mode === 'out') {
+                if(amt > safeBal) { alert("Insufficient Safe Balance!"); return; }
+                
+                // Deduct from safe, add to main
+                safeBal -= amt;
+                mainBal += amt;
+                
+                localStorage.setItem('r_bal', mainBal);
+                localStorage.setItem('r_safe_bal', safeBal);
+                
+                alert(`₹${amt} transferred to Main Wallet successfully!`);
+            }
+
+            closeModal();
+            updateUI();
+        }
+
+        // Init page
+        updateUI();
+        
+        // Auto update every 1 minute to show live interest growing
+        setInterval(updateUI, 60000); 
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chicken Road - Raja Luck</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* 🚨 UI THEME - NO CHANGES 🚨 */
+        body { margin: 0; padding: 0; background-color: #121212; color: #ffffff; font-family: Arial, sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background-color: #1f1f1f; border-bottom: 2px solid #333; }
+        .logo { font-size: 18px; font-weight: 900; color: #fff; font-family: 'Impact', sans-serif;}
+        .logo span { color: #e74c3c; }
+        .bal-box { font-size: 12px; font-weight: bold; color: #fff; background: #333; padding: 5px 10px; border-radius: 15px;}
+        .game-area { height: 350px; background-color: #636363; position: relative; overflow: hidden; border-bottom: 2px solid #333;}
+        .sidewalk { position: absolute; left: 0; top: 0; width: 80px; height: 100%; background: #6ab04c; border-right: 5px solid #bdc3c7; z-index: 1;}
+        .bush { width: 50px; height: 50px; background: #27ae60; border-radius: 50%; position: absolute; left: 10px; border: 2px solid #2ecc71;}
+        .road-lines { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-around; pointer-events: none;}
+        .line-dash { height: 20px; border-right: 4px dashed #fff; margin-left: 50%; opacity: 0.5;}
+        #roadContainer { position: absolute; left: 100px; top: 0; height: 100%; display: flex; align-items: center; gap: 30px; transition: transform 0.3s ease-out; z-index: 2; width: max-content;}
+        .manhole { width: 80px; height: 80px; background: #4a4a4a; border-radius: 50%; border: 6px solid #333; display: flex; justify-content: center; align-items: center; font-weight: 900; font-size: 16px; color: #ccc; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); opacity: 0.5; transition: 0.2s; flex-shrink: 0;}
+        .manhole.active { opacity: 1; color: #fff; background: #555; border-color: #2ecc71; box-shadow: 0 0 15px rgba(46,204,113,0.5);}
+        #chicken { position: absolute; left: 15px; top: 50%; margin-top: -30px; font-size: 60px; z-index: 5; transition: left 0.3s ease, top 0.15s ease; filter: drop-shadow(2px 5px 2px rgba(0,0,0,0.5));}
+        .face-right { display: inline-block; transform: scaleX(-1); }
+        #car { position: absolute; left: 110px; top: -100px; font-size: 70px; z-index: 6; transition: top 0.2s ease-in; display: none; filter: drop-shadow(0 10px 5px rgba(0,0,0,0.5));}
+        #crashScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(231,76,60,0.8); z-index: 10; display: none; flex-direction: column; justify-content: center; align-items: center;}
+        #crashScreen h1 { font-size: 40px; margin: 0; text-shadow: 2px 2px 5px #000; }
+        .controls { padding: 15px; background: #2c2c2c; border-radius: 15px 15px 0 0; margin-top: -15px; position: relative; z-index: 20;}
+        .bet-box { background: #3d3d3d; border-radius: 8px; padding: 10px; margin-bottom: 10px; border: 1px solid #555;}
+        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 5px;}
+        .bet-input-wrap { display: flex; align-items: center; background: #2c2c2c; border-radius: 5px; flex: 2; padding: 5px; border: 1px solid #444;}
+        .btn-pm { background: transparent; border: none; color: #aaa; font-size: 20px; padding: 0 10px; cursor: pointer; }
+        .bet-input { background: transparent; border: none; color: #fff; font-size: 16px; font-weight: bold; text-align: center; width: 100%; outline: none; }
+        .q-btn { flex: 1; background: #4a4a4a; border: none; color: #fff; padding: 10px 0; border-radius: 5px; font-weight: bold; cursor: pointer;}
+        .diff-select { width: 100%; background: #4a4a4a; color: #fff; border: 1px solid #555; padding: 10px; border-radius: 5px; font-weight: bold; font-size: 14px; margin-bottom: 15px; outline: none; -webkit-appearance: none;}
+        .action-row { display: flex; gap: 10px; }
+        .action-btn { flex: 1; padding: 15px; border: none; border-radius: 8px; font-size: 18px; font-weight: 900; cursor: pointer; color: white; text-transform: uppercase; transition: 0.1s;}
+        .btn-play { background: #2ecc71; box-shadow: 0 4px 0 #27ae60; width: 100%;}
+        .btn-jump { background: #3498db; box-shadow: 0 4px 0 #2980b9; display: none;}
+        .btn-cashout { background: #f1c40f; color: #000; box-shadow: 0 4px 0 #f39c12; display: none;}
+        .disabled-btn { opacity: 0.5; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div onclick="window.history.back()" style="font-size:20px; cursor:pointer;">&lsaquo;</div>
+        <div class="logo">CHICKEN<span>2</span>ROAD</div>
+        <div class="bal-box"><span id="balance">0.00</span> INR</div>
+    </div>
+
+    <div class="game-area">
+        <div class="sidewalk"><div class="bush" style="top: 20px;"></div><div class="bush" style="bottom: 20px; left: 15px;"></div></div>
+        <div class="road-lines"><div class="line-dash"></div><div class="line-dash"></div><div class="line-dash"></div><div class="line-dash"></div></div>
+        <div id="chicken"><span class="face-right">🐔</span></div>
+        <div id="car">🚘</div>
+        <div id="roadContainer"></div>
+        <div id="crashScreen"><h1>CRASHED!</h1><p style="font-weight:bold;">Chicken got hit!</p></div>
+    </div>
+
+    <div class="controls">
+        <div class="bet-box">
+            <div style="font-size: 11px; color:#aaa; margin-bottom:5px;">Bet Amount:</div>
+            <div class="input-row">
+                <div class="bet-input-wrap">
+                    <button class="btn-pm" onclick="chgBet(-10)">-</button>
+                    <input type="number" id="betInput" class="bet-input" value="10.00" onkeyup="checkMinBet()">
+                    <button class="btn-pm" onclick="chgBet(10)">+</button>
+                </div>
+                <button class="q-btn" onclick="setBet(0.5)">x0.5</button>
+                <button class="q-btn" onclick="setBet(2.0)">x2.0</button>
+            </div>
+            <select class="diff-select" id="difficulty" onchange="buildRoad()">
+                <option value="easy">Easy (More steps, low risk)</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+        </div>
+        <div class="action-row">
+            <button class="action-btn btn-play" id="btnPlay" onclick="startGame()">Play</button>
+            <button class="action-btn btn-jump" id="btnJump" onclick="makeJump()">Jump</button>
+            <button class="action-btn btn-cashout disabled-btn" id="btnCashout" onclick="cashOut()">Cashout</button>
+        </div>
+    </div>
+
+    <script>
+        // 🚨 1. FIREBASE SETUP (SYCHRONIZED) 🚨
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var fireDB = firebase.firestore();
+        var userDocId = ""; 
+
+        var bal = 0.00; 
+
+        // 🚨 2. CLOUD BALANCE SYNC 🚨
+        function syncCloudBalance() {
+            var savedUid = localStorage.getItem("r_uid");
+            if(!savedUid) return;
+            fireDB.collection("users").where("uid", "==", parseInt(savedUid)).get().then((snapshot) => {
+                snapshot.forEach((doc) => {
+                    userDocId = doc.id;
+                    var data = doc.data();
+                    bal = data.balance || 0;
+                    document.getElementById("balance").innerText = bal.toFixed(2);
+                    localStorage.setItem('r_bal', bal);
+                });
+            }).catch(err => console.log("Balance Sync Error"));
+        }
+
+        // --- GAME DATA ---
+        var mults = {
+            easy: [1.02, 1.08, 1.14, 1.29, 1.37, 1.46, 1.56, 1.90, 2.47, 2.69, 5.00, 8.74, 10.33, 18.94, 24.35],
+            medium: [1.10, 1.25, 1.50, 1.90, 2.50, 4.00, 7.00, 12.00, 20.00],
+            hard: [1.20, 1.60, 2.30, 3.50, 6.00, 12.00, 25.00]
+        };
+
+        var currentMode = "easy";
+        var betAmt = 10;
+        var currentStep = -1; 
+        var crashStep = 0; 
+        var isPlaying = false;
+        var isJumping = false; 
+
+        var elRoad = document.getElementById("roadContainer");
+        var elChicken = document.getElementById("chicken");
+        var elCar = document.getElementById("car");
+        var elCrash = document.getElementById("crashScreen");
+        var btnPlay = document.getElementById("btnPlay");
+        var btnJump = document.getElementById("btnJump");
+        var btnCashout = document.getElementById("btnCashout");
+
+        // ORIGINAL RIGGED ENGINE
+        function determineCrashStep() {
+            var modeArr = mults[currentMode];
+            var lossCount = Number(localStorage.getItem('cr_losses') || 0);
+            if (lossCount < 3) { return Math.floor(Math.random() * 2); } 
+            if (lossCount >= 3) {
+                localStorage.setItem('cr_losses', 0); 
+                var maxStep = Math.min(4, modeArr.length - 2); 
+                return 2 + Math.floor(Math.random() * (maxStep - 1));
+            }
+        }
+
+        window.buildRoad = function() {
+            if(isPlaying) return;
+            currentMode = document.getElementById("difficulty").value;
+            var arr = mults[currentMode];
+            var h = "";
+            for(var i=0; i<arr.length; i++) { h += "<div class='manhole' id='mh_" + i + "'>" + arr[i].toFixed(2) + "x</div>"; }
+            elRoad.innerHTML = h;
+            resetVisuals();
+        }
+
+        function resetVisuals() {
+            currentStep = -1; isJumping = false;
+            elRoad.style.transform = "translateX(0px)";
+            elChicken.style.left = "15px"; elChicken.style.top = "50%"; 
+            elCar.style.display = "none"; elCrash.style.display = "none";
+            var holes = document.getElementsByClassName("manhole");
+            for(var i=0; i<holes.length; i++) holes[i].className = "manhole";
+            btnPlay.style.display = "block"; btnJump.style.display = "none";
+            btnJump.className = "action-btn btn-jump";
+            btnCashout.style.display = "none"; btnCashout.className = "action-btn btn-cashout disabled-btn";
+        }
+
+        window.checkMinBet = function() {
+            var val = parseFloat(document.getElementById("betInput").value);
+            if(isNaN(val) || val < 10) val = 10; betAmt = val;
+        }
+        window.chgBet = function(val) {
+            if(isPlaying) return; betAmt += val; if(betAmt < 10) betAmt = 10;
+            document.getElementById("betInput").value = betAmt.toFixed(2);
+        }
+        window.setBet = function(mult) {
+            if(isPlaying) return; betAmt = betAmt * mult; if(betAmt < 10) betAmt = 10;
+            document.getElementById("betInput").value = betAmt.toFixed(2);
+        }
+
+        // 🚨 3. CLOUD-SECURE GAME START 🚨
+        window.startGame = function() {
+            if(!userDocId) return alert("Syncing... try again.");
+            checkMinBet();
+            if(bal < betAmt) { alert("Low Balance! Please Deposit."); return; }
+            
+            // Deduct from Firebase directly
+            fireDB.collection("users").doc(userDocId).update({
+                balance: firebase.firestore.FieldValue.increment(-betAmt)
+            }).then(() => {
+                bal -= betAmt;
+                document.getElementById("balance").innerText = bal.toFixed(2);
+                localStorage.setItem('r_bal', bal);
+                isPlaying = true;
+                resetVisuals();
+                crashStep = determineCrashStep();
+                btnPlay.style.display = "none";
+                btnJump.style.display = "block";
+                btnCashout.style.display = "block";
+                btnCashout.innerText = "Cashout";
+            }).catch(err => alert("Error starting game"));
+        }
+
+        window.makeJump = function() {
+            if(!isPlaying || isJumping) return;
+            isJumping = true;
+            btnJump.className = "action-btn btn-jump disabled-btn"; 
+            currentStep++;
+            elChicken.style.top = "20%";
+            if(currentStep === 0) { elChicken.style.left = "110px"; } 
+            else { var distance = currentStep * 122; elRoad.style.transform = "translateX(-" + distance + "px)"; }
+            setTimeout(() => { elChicken.style.top = "50%"; }, 150);
+            setTimeout(() => {
+                if(currentStep === crashStep) { triggerCrash(); } 
+                else {
+                    document.getElementById("mh_" + currentStep).className = "manhole active";
+                    var currentM = mults[currentMode][currentStep];
+                    var winAmt = betAmt * currentM;
+                    btnCashout.className = "action-btn btn-cashout"; 
+                    btnCashout.innerText = "Cashout ₹" + winAmt.toFixed(2);
+                    btnJump.className = "action-btn btn-jump"; isJumping = false; 
+                }
+            }, 300);
+        }
+
+        function triggerCrash() {
+            var holes = document.getElementsByClassName("manhole");
+            if(holes[currentStep]) holes[currentStep].style.borderColor = "#e74c3c";
+            elCar.style.display = "block"; elCar.style.top = "-100px";
+            setTimeout(() => {
+                elCar.style.top = "160px"; 
+                var lossCount = Number(localStorage.getItem('cr_losses') || 0);
+                localStorage.setItem('cr_losses', lossCount + 1);
+                setTimeout(() => {
+                    elCrash.style.display = "flex";
+                    isPlaying = false;
+                    setTimeout(resetVisuals, 2000);
+                }, 400);
+            }, 50);
+        }
+
+        // 🚨 4. CLOUD-SECURE CASHOUT 🚨
+        window.cashOut = function() {
+            if(!isPlaying || currentStep < 0) return;
+            var currentM = mults[currentMode][currentStep];
+            var winAmt = betAmt * currentM;
+            
+            // Update Firebase winnings
+            fireDB.collection("users").doc(userDocId).update({
+                balance: firebase.firestore.FieldValue.increment(winAmt)
+            }).then(() => {
+                bal += winAmt;
+                document.getElementById("balance").innerText = bal.toFixed(2);
+                localStorage.setItem('r_bal', bal);
+                localStorage.setItem('cr_losses', 0); 
+                alert("✅ Cashed Out! Won: ₹" + winAmt.toFixed(2));
+                isPlaying = false;
+                resetVisuals();
+            });
+        }
+
+        // Boot
+        syncCloudBalance();
+        buildRoad();
+    </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Commission Details - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f5f5f9; color: #333; padding-bottom: 30px; }
+
+        /* HEADER */
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; height: 60px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+        .back-btn { position: absolute; left: 15px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .header-title { font-size: 18px; font-weight: bold; }
+
+        /* FILTERS ROW */
+        .filter-row { display: flex; gap: 10px; padding: 15px; }
+        .filter-box { flex: 1; background: white; border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border: 1px solid #f1f2f6; position: relative; }
+        .filter-icon { color: #6c5ce7; font-size: 14px; opacity: 0.8; }
+        
+        .filter-select, .filter-date { border: none; background: transparent; font-size: 13px; font-weight: bold; color: #a4b0be; outline: none; width: 100%; -webkit-appearance: none; cursor: pointer; }
+        .filter-select { color: #a4b0be; } /* Muted text for type */
+        .filter-box::after { content: '\f107'; font-family: 'Font Awesome 5 Free'; font-weight: 900; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #a4b0be; font-size: 12px; pointer-events: none;}
+
+        /* LIST CONTAINER */
+        .list-container { padding: 0 15px; }
+
+        /* COMMISSION CARD */
+        .comm-card { background: white; border-radius: 10px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        
+        /* Card Header */
+        .card-header { background: #6c5ce7; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
+        .ch-title { font-size: 14px; font-weight: bold; }
+        .ch-date { font-size: 11px; color: rgba(255,255,255,0.7); font-weight: normal; letter-spacing: 0.5px;}
+
+        /* Card Body Row */
+        .card-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px dashed #f1f2f6; font-size: 13px; }
+        .card-row:last-child { border-bottom: none; }
+        
+        .cr-label { color: #747d8c; }
+        .cr-val { color: #2f3542; font-weight: bold; }
+        
+        /* Value specific styles */
+        .cr-val.light { color: #747d8c; font-weight: normal; }
+        .lvl-badge { background: #f0edff; color: #6c5ce7; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 900; }
+        .cr-val.orange { color: #e67e22; font-size: 15px; font-weight: 900; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="back-btn" onclick="window.history.back()">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="header-title">Commission details</div>
+    </div>
+
+    <div class="filter-row">
+        <div class="filter-box">
+            <i class="fas fa-filter filter-icon"></i>
+            <select class="filter-select">
+                <option value="all">Choose a type</option>
+                <option value="lottery">Lottery commission</option>
+            </select>
+        </div>
+        <div class="filter-box">
+            <i class="far fa-calendar-alt filter-icon"></i>
+            <input type="date" class="filter-date" id="filterDate">
+        </div>
+    </div>
+
+    <div class="list-container">
+        
+        <div class="comm-card">
+            <div class="card-header">
+                <div class="ch-title">Lottery commission</div>
+                <div class="ch-date" id="todayDate">2026-05-08 00:00:00</div>
+            </div>
+            <div class="card-row">
+                <div class="cr-label">Number of bettors</div>
+                <div class="cr-val light">0 people</div>
+            </div>
+            <div class="card-row">
+                <div class="cr-label">Bet amount</div>
+                <div class="cr-val">0</div>
+            </div>
+            <div class="card-row">
+                <div class="cr-label">Agent level</div>
+                <div class="lvl-badge">L0</div>
+            </div>
+            <div class="card-row">
+                <div class="cr-label">Commission Settlement</div>
+                <div class="cr-val orange">0.00</div>
+            </div>
+        </div>
+
+        <div class="comm-card">
+            <div class="card-header">
+                <div class="ch-title">Lottery commission</div>
+                <div class="ch-date" id="yesterdayDate">2026-05-07 00:00:00</div>
+            </div>
+            <div class="card-row">
+                <div class="cr-label">Number of bettors</div>
+                <div class="cr-val light">0 people</div>
+            </div>
+            <div class="card-row">
+                <div class="cr-label">Bet amount</div>
+                <div class="cr-val">0</div>
+            </div>
+            <div class="card-row">
+                <div class="cr-label">Agent level</div>
+                <div class="lvl-badge">L0</div>
+            </div>
+            <div class="card-row">
+                <div class="cr-label">Commission Settlement</div>
+                <div class="cr-val orange">0.00</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Set Dates Automatically
+        window.onload = function() {
+            var today = new Date();
+            var yyyy = today.getFullYear();
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var dd = String(today.getDate()).padStart(2, '0');
+            
+            var todayStr = yyyy + '-' + mm + '-' + dd;
+            
+            // Set input date
+            document.getElementById("filterDate").value = todayStr;
+            
+            // Set Card 1 Date
+            document.getElementById("todayDate").innerText = todayStr + " 00:00:00";
+
+            // Set Card 2 Date (Yesterday)
+            var yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            var y_yyyy = yesterday.getFullYear();
+            var y_mm = String(yesterday.getMonth() + 1).padStart(2, '0');
+            var y_dd = String(yesterday.getDate()).padStart(2, '0');
+            document.getElementById("yesterdayDate").innerText = y_yyyy + '-' + y_mm + '-' + y_dd + " 00:00:00";
+        };
+    </script>
+</body>
+</html>

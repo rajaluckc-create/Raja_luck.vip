@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Announcement - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f5f5f9; color: #333; padding-bottom: 30px; }
+
+        /* HEADER */
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; height: 60px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+        
+        .back-btn { position: absolute; left: 15px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .back-btn i { font-size: 16px; }
+        
+        .header-title { font-size: 18px; font-weight: bold; }
+
+        .container { padding: 15px; }
+
+        /* ANNOUNCEMENT CARD */
+        .announce-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); position: relative; overflow: hidden; border-top: 3px solid #f6c745; margin-bottom: 30px;}
+        
+        /* CARD HEADER */
+        .card-header { display: flex; align-items: center; margin-bottom: 15px; }
+        
+        .icon-box { width: 32px; height: 32px; background: #fff0f1; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #ff4757; font-size: 14px; margin-right: 12px; }
+        
+        .card-title { font-size: 16px; font-weight: 900; color: #3b236d; }
+
+        /* CARD BODY TEXT */
+        .card-text { font-size: 14px; color: #747d8c; line-height: 1.7; font-weight: 500; margin-bottom: 20px; text-align: justify;}
+
+        /* DATE TIME */
+        .card-date { font-size: 12px; color: #dcdde1; font-weight: bold; letter-spacing: 1px;}
+
+        /* NO MORE TEXT */
+        .no-more { text-align: center; color: #b2bec3; font-size: 13px; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="back-btn" onclick="window.history.back()">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="header-title">Announcement</div>
+    </div>
+
+    <div class="container">
+        
+        <div class="announce-card">
+            <div class="card-header">
+                <div class="icon-box">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <div class="card-title">Message Notification</div>
+            </div>
+
+            <div class="card-text">
+                Dear RAJALUCK user: We are very happy that you chose RAJALUCK and we welcome your participation. We are committed to providing excellent service and exceptional benefits to our new customers and agents. If you need any assistance or have any questions, please don't hesitate to contact our customer service team. We thank you for your trust and support. Best regards, RAJALUCK
+            </div>
+
+            <div class="card-date">2023-10-30 23:39:01</div>
+        </div>
+
+        <div class="no-more">no more</div>
+
+    </div>
+
+</body>
+</html>

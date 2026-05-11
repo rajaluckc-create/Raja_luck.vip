@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Customer Service - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f8f9fc; color: #333; padding-bottom: 30px; }
+
+        /* PURPLE BANNER HEADER */
+        .banner { background: linear-gradient(135deg, #8b3cff, #6c5ce7); height: 260px; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Background circles for effect */
+        .banner::before { content: ''; position: absolute; width: 200px; height: 200px; background: rgba(255,255,255,0.05); border-radius: 50%; top: -50px; left: -50px; }
+        .banner::after { content: ''; position: absolute; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; bottom: 20px; right: -30px; }
+
+        .header-top { width: 100%; padding: 15px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 10; color: white; }
+        .back-btn { position: absolute; left: 15px; width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .header-title { font-size: 18px; font-weight: bold; text-transform: lowercase; }
+
+        /* MIDDLE ICON */
+        .service-icon-box { margin-top: 20px; width: 60px; height: 60px; background: rgba(255,255,255,0.15); border-radius: 18px; display: flex; align-items: center; justify-content: center; z-index: 10; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(5px);}
+        .service-icon-box i { font-size: 24px; color: white; opacity: 0.9; }
+        .service-title { color: white; font-size: 16px; font-weight: bold; margin-top: 15px; z-index: 10; text-transform: lowercase; }
+
+        /* LIST CONTAINER (Pulled up) */
+        .container { padding: 0 15px; margin-top: -30px; position: relative; z-index: 20; }
+
+        /* SERVICE BUTTONS */
+        .service-btn { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.03); cursor: pointer; transition: 0.2s; }
+        .service-btn:active { transform: scale(0.98); background: #f8f9fa; }
+        
+        .btn-left { display: flex; align-items: center; gap: 15px; }
+        .icon-box { width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; }
+        
+        /* Unique Icon Colors */
+        .bg-orange { background: #e67e22; }
+        .bg-purple { background: #8e44ad; }
+        .bg-blue { background: #4a69bd; }
+        .bg-pink { background: #e84393; }
+        .bg-green { background: #2ecc71; }
+
+        .btn-text { font-size: 14px; font-weight: bold; color: #2f3542; }
+        .chevron { color: #dcdde1; font-size: 14px; }
+
+        /* NOTICE SECTION */
+        .notice-card { background: white; border-radius: 12px; padding: 20px; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border-top: 3px solid #8b3cff; }
+        .notice-title { font-size: 14px; font-weight: 900; color: #8b3cff; margin-bottom: 12px; }
+        .notice-text { font-size: 12px; color: #747d8c; line-height: 1.6; margin-bottom: 15px; font-weight: 500;}
+        .notice-warning { font-size: 12px; color: #e74c3c; line-height: 1.5; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+    <div class="banner">
+        <div class="header-top">
+            <div class="back-btn" onclick="window.history.back()">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            <div class="header-title">customer service</div>
+        </div>
+
+        <div class="service-icon-box">
+            <i class="fas fa-smile"></i>
+        </div>
+        <div class="service-title">customer service</div>
+    </div>
+
+    <div class="container">
+        
+        <div class="service-btn" onclick="openTelegram()">
+            <div class="btn-left">
+                <div class="icon-box bg-orange"><i class="fas fa-bolt"></i></div>
+                <div class="btn-text">Fast Deposit Processing</div>
+            </div>
+            <i class="fas fa-chevron-right chevron"></i>
+        </div>
+
+        <div class="service-btn" onclick="openTelegram()">
+            <div class="btn-left">
+                <div class="icon-box bg-purple"><i class="far fa-credit-card"></i></div>
+                <div class="btn-text">Withdrawal Not Received?</div>
+            </div>
+            <i class="fas fa-chevron-right chevron"></i>
+        </div>
+
+        <div class="service-btn" onclick="openTelegram()">
+            <div class="btn-left">
+                <div class="icon-box bg-blue"><i class="fas fa-file-invoice-dollar"></i></div>
+                <div class="btn-text">How to earn money and become an agent?</div>
+            </div>
+            <i class="fas fa-chevron-right chevron"></i>
+        </div>
+
+        <div class="service-btn" onclick="openTelegram()">
+            <div class="btn-left">
+                <div class="icon-box bg-pink"><i class="far fa-question-circle"></i></div>
+                <div class="btn-text">Game Related Questions!</div>
+            </div>
+            <i class="fas fa-chevron-right chevron"></i>
+        </div>
+
+        <div class="service-btn" onclick="openTelegram()">
+            <div class="btn-left">
+                <div class="icon-box bg-green"><i class="fas fa-comment-dots"></i></div>
+                <div class="btn-text">Live Chat - Pro</div>
+            </div>
+            <i class="fas fa-chevron-right chevron"></i>
+        </div>
+
+        <div class="notice-card">
+            <div class="notice-title">Notice</div>
+            <div class="notice-text">
+                If your deposit has not arrived, please submit your issue through the self-service form above. A dedicated staff member will handle your case, which will be faster.
+            </div>
+            <div class="notice-warning">
+                Please note:<br>
+                If one or two or three submissions do not resolve your issue, please submit more times until it is resolved.
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Central function to open Telegram Channel
+        function openTelegram() {
+            // Your real Telegram Link
+            window.open('https://t.me/z0pji', '_blank');
+        }
+    </script>
+</body>
+</html>

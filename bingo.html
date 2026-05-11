@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Win Go 1Min - Raja Luck</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* ORIGINAL ROYAL DARK THEME - NO CHANGES */
+        body { margin: 0; padding: 0; background-color: #141124; color: #ffffff; font-family: sans-serif; padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
+        .header { padding: 15px; display: flex; justify-content: space-between; align-items: center; background: #141124; }
+        .logo { font-size: 20px; font-weight: bold; color: #f6c745; }
+        .wallet-card { text-align: center; padding: 10px; }
+        .bal-amt { font-size: 28px; font-weight: bold; color: #f6c745; margin-bottom: 5px; }
+        .btn-box { display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
+        .w-btn { padding: 10px 30px; border-radius: 30px; border: none; font-weight: bold; font-size: 14px; cursor: pointer; min-width: 120px; }
+        
+        .time-header { background: #201d36; padding: 12px; margin: 10px 15px; border-radius: 10px; text-align: center; font-size: 16px; font-weight: bold; color: #f6c745; border: 1px solid #f6c745; }
+
+        .board { background: #201d36; margin: 10px 15px; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; }
+        .t-digit { background: rgba(255,255,255,0.1); padding: 4px 6px; border-radius: 4px; font-size: 18px; font-weight: bold; color: #f6c745; }
+        .period-no { font-size: 14px; font-weight: bold; color: #f6c745; margin-top: 5px; }
+        .control-area { padding: 0 15px; transition: opacity 0.2s; }
+        .color-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .c-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: bold; color: #fff; text-transform: capitalize; }
+        .num-grid { background: #201d36; padding: 15px; border-radius: 15px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 15px; }
+        .n-btn { width: 100%; aspect-ratio: 1; border-radius: 50%; border: none; font-size: 20px; font-weight: bold; color: #fff; box-shadow: inset -2px -2px 5px rgba(0,0,0,0.3); }
+        .size-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .s-btn { flex: 1; padding: 15px; border: none; border-radius: 40px; font-size: 18px; font-weight: bold; }
+        
+        .tabs { display: flex; background: #201d36; margin: 0 15px; border-radius: 10px; }
+        .tab { flex: 1; padding: 12px; text-align: center; font-size: 12px; font-weight: bold; color: #8b899c; cursor: pointer; }
+        .tab.active { color: #f6c745; border-bottom: 2px solid #f6c745; }
+        .content { display: none; background: #201d36; margin: 0 15px 15px; padding: 10px; border-radius: 0 0 10px 10px; }
+        .content.active { display: block; }
+        
+        table { width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; }
+        th { padding: 10px; color: #f6c745; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        td { padding: 12px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin: 0 2px; }
+        
+        .my-item { background: #19162c; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .my-box { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 14px;}
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; align-items: flex-end; }
+        .m-card { background: #141124; width: 100%; padding: 20px; border-radius: 20px 20px 0 0; }
+        
+        .bg-g { background: #1eb861; } .bg-v { background: #9d48e0; } .bg-r { background: #ec4043; }
+        .bg-y { background: #f6c745; color: #000; } .bg-b { background: #864cff; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <span onclick="window.history.back()" style="font-size:24px; padding:5px; cursor:pointer;">&lsaquo;</span>
+        <div class="logo">👑 RAJALUCK</div>
+        <span style="font-size:20px;">🎧</span>
+    </div>
+
+    <div class="wallet-card">
+        <div class="bal-amt">₹ <span id="balance">0.00</span></div>
+        <div style="font-size: 11px; color: #8b899c;">AVAILABLE BALANCE</div>
+        <div class="btn-box">
+            <button class="w-btn bg-y" onclick="window.location.href='withdraw.html'">Withdraw</button>
+            <button class="w-btn bg-b" style="color:white;" onclick="window.location.href='deposit.html'">Deposit</button>
+        </div>
+    </div>
+
+    <div class="time-header">
+        ⏳ Win Go 1Min
+    </div>
+
+    <div class="board">
+        <div>
+            <div style="font-size: 12px; font-weight: bold;">Game Status</div>
+            <div style="color:#1eb861; font-weight:bold; margin-top:5px;">Running...</div>
+        </div>
+        <div style="text-align: right;">
+            <div style="font-size: 11px; color:#8b899c;">Time Remaining</div>
+            <div style="display: flex; justify-content: flex-end; gap: 4px; margin-top: 5px;">
+                <span class="t-digit">0</span><span class="t-digit">0</span><span style="color:#f6c745; font-weight:bold;">:</span><span class="t-digit" id="s1">0</span><span class="t-digit" id="s2">0</span>
+            </div>
+            <div class="period-no" id="period">Loading...</div>
+        </div>
+    </div>
+
+    <div id="controls" class="control-area">
+        <div class="color-row">
+            <button class="c-btn bg-g" onclick="askBet('Green', '#1eb861')">Green</button>
+            <button class="c-btn bg-v" onclick="askBet('Purple', '#9d48e0')">Purple</button>
+            <button class="c-btn bg-r" onclick="askBet('Red', '#ec4043')">Red</button>
+        </div>
+        <div class="num-grid">
+            <button class="n-btn" style="background:linear-gradient(135deg, #ec4043 50%, #9d48e0 50%)" onclick="askBet('0', '#ec4043')">0</button>
+            <button class="n-btn bg-g" onclick="askBet('1', '#1eb861')">1</button>
+            <button class="n-btn bg-r" onclick="askBet('2', '#ec4043')">2</button>
+            <button class="n-btn bg-g" onclick="askBet('3', '#1eb861')">3</button>
+            <button class="n-btn bg-r" onclick="askBet('4', '#ec4043')">4</button>
+            <button class="n-btn" style="background:linear-gradient(135deg, #1eb861 50%, #9d48e0 50%)" onclick="askBet('5', '#1eb861')">5</button>
+            <button class="n-btn bg-r" onclick="askBet('6', '#ec4043')">6</button>
+            <button class="n-btn bg-g" onclick="askBet('7', '#1eb861')">7</button>
+            <button class="n-btn bg-r" onclick="askBet('8', '#ec4043')">8</button>
+            <button class="n-btn bg-g" onclick="askBet('9', '#1eb861')">9</button>
+        </div>
+        <div class="size-row">
+            <button class="s-btn bg-y" onclick="askBet('Big', '#f6c745')">Big</button>
+            <button class="s-btn bg-b" style="color:white;" onclick="askBet('Small', '#864cff')">Small</button>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" id="t1" onclick="goTab('rec')">Game Record</div>
+        <div class="tab" id="t2" onclick="goTab('my')">My Record</div>
+    </div>
+    
+    <div class="content active" id="v-rec">
+        <table><thead><tr><th>Period</th><th>Num</th><th>Size</th><th>Color</th></tr></thead><tbody id="histBody"></tbody></table>
+    </div>
+    
+    <div class="content" id="v-my"><div id="myBody" style="text-align:center; padding:20px; color:#8b899c;">No Data</div></div>
+
+    <div class="modal" id="betModal">
+        <div class="m-card">
+            <div id="mHead" style="padding:15px; border-radius:10px; text-align:center; font-weight:bold; margin-bottom:15px; color:#fff;">Win Go 1Min: <span id="mTitle"></span></div>
+            
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                <span style="color:#fff;">Amt:</span>
+                <div style="display:flex; gap:5px;">
+                    <button id="btn1" onclick="setAmt(1)" style="padding:5px 12px; background:#f6c745; color:#000; border:none; border-radius:5px; font-weight:bold;">1</button>
+                    <button id="btn10" onclick="setAmt(10)" style="padding:5px 12px; background:#333; color:#fff; border:none; border-radius:5px; font-weight:bold;">10</button>
+                    <button id="btn100" onclick="setAmt(100)" style="padding:5px 12px; background:#333; color:#fff; border:none; border-radius:5px; font-weight:bold;">100</button>
+                    <button id="btn1000" onclick="setAmt(1000)" style="padding:5px 12px; background:#333; color:#fff; border:none; border-radius:5px; font-weight:bold;">1K</button>
+                </div>
+            </div>
+            
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                <span style="color:#fff;">Qty:</span>
+                <div>
+                    <button onclick="chgQty(-1)" style="padding:5px 15px; background:#f6c745; border:none; font-weight:bold; border-radius:5px;">-</button>
+                    <span id="mQty" style="color:#fff; padding:0 15px; font-weight:bold;">1</span>
+                    <button onclick="chgQty(1)" style="padding:5px 15px; background:#f6c745; border:none; font-weight:bold; border-radius:5px;">+</button>
+                </div>
+            </div>
+
+            <button class="w-btn bg-y" style="width:100%; margin-bottom:10px;" id="confirmBetBtn" onclick="confirmBet()">Confirm ₹<span id="mTotal">1.00</span></button>
+            <button class="w-btn" style="width:100%; background:transparent; color:#8b899c; border:1px solid #333;" onclick="document.getElementById('betModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // 🚨 1. FIREBASE SETUP 🚨
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var fireDB = firebase.firestore();
+        var userDocId = ""; 
+
+        var bal = 0; 
+        
+        function syncCloudBalance() {
+            var savedUid = localStorage.getItem("r_uid");
+            if(!savedUid) return;
+
+            fireDB.collection("users").where("uid", "==", parseInt(savedUid)).get().then((snapshot) => {
+                snapshot.forEach((doc) => {
+                    userDocId = doc.id;
+                    var data = doc.data();
+                    bal = data.balance || 0;
+                    document.getElementById("balance").innerHTML = bal.toFixed(2);
+                    localStorage.setItem('r_bal', bal);
+                });
+            }).catch(err => console.log("Cloud Sync Error: ", err));
+        }
+
+        var curP = "";
+        var myHist = [];
+        var activeBets = [];
+        var selBet = "", selCol = "", bAmt = 1, bQty = 1;
+
+        function getRes(pStr) {
+            var n = 0;
+            for(var i = 0; i < pStr.length; i++) {
+                n += pStr.charCodeAt(i) * (i + 3);
+            }
+            var chaos = Math.abs(Math.sin(n) * 10000);
+            return Math.floor(chaos) % 10;
+        }
+
+        function tick() {
+            var d = new Date();
+            var rem = 60 - d.getSeconds(); 
+            
+            var seq = (d.getHours() * 60) + d.getMinutes() + 1;
+            var pid = d.getFullYear() + ("0" + (d.getMonth() + 1)).slice(-2) + ("0" + d.getDate()).slice(-2) + ("000" + seq).slice(-4);
+
+            document.getElementById("period").innerHTML = pid;
+            document.getElementById("s1").innerHTML = Math.floor(rem / 10);
+            document.getElementById("s2").innerHTML = rem % 10;
+
+            var ctrl = document.getElementById("controls");
+            if(rem <= 5) {
+                ctrl.style.opacity = '0.4';
+                ctrl.style.pointerEvents = 'none';
+            } else {
+                ctrl.style.opacity = '1';
+                ctrl.style.pointerEvents = 'auto';
+            }
+
+            if (curP !== pid) {
+                if (curP !== "") checkWin(curP);
+                curP = pid;
+                activeBets = [];
+                drawHist(pid);
+                syncCloudBalance(); 
+            }
+        }
+
+        function drawHist(base) {
+            var h = ""; 
+            var bn = Number(base.slice(-4));
+            var pref = base.slice(0, -4);
+
+            for(var i=1; i<=10; i++) {
+                var pNum = bn - i;
+                if(pNum <= 0) break;
+                var p = pref + ("000" + pNum).slice(-4); 
+                var n = getRes(p);
+                var isB = n >= 5 ? "Big" : "Small";
+                
+                var cName = "Red";
+                if(n==1||n==3||n==7||n==9) cName = "Green";
+                if(n==0) cName = "Red+Purple"; if(n==5) cName = "Green+Purple";
+
+                var dots = "";
+                if(cName.indexOf('Red') > -1) dots += "<span class='dot bg-r'></span>";
+                if(cName.indexOf('Green') > -1) dots += "<span class='dot bg-g'></span>";
+                if(cName.indexOf('Purple') > -1) dots += "<span class='dot bg-v'></span>";
+                var tCol = cName.indexOf('Green') > -1 ? '#1eb861' : (cName.indexOf('Red') > -1 ? '#ec4043' : '#9d48e0');
+
+                h += "<tr><td>"+p+"</td><td style='color:"+tCol+"; font-weight:bold;'>"+n+"</td><td>"+isB+"</td><td>"+dots+"</td></tr>";
+            }
+            document.getElementById("histBody").innerHTML = h;
+        }
+
+        window.askBet = function(val, col) {
+            selBet = val; selCol = col;
+            document.getElementById("mTitle").innerHTML = val;
+            document.getElementById("mHead").style.background = col;
+            document.getElementById("mHead").style.color = (col === '#f6c745') ? '#000' : '#fff';
+            bQty = 1; setAmt(1); 
+            document.getElementById("betModal").style.display = "flex";
+        };
+
+        window.setAmt = function(a) { 
+            bAmt = a; 
+            [1,10,100,1000].forEach(function(v){
+                var btn = document.getElementById("btn"+v);
+                if(btn) {
+                    btn.style.background = (a==v) ? "#f6c745" : "#333";
+                    btn.style.color = (a==v) ? "#000" : "#fff";
+                }
+            });
+            updM(); 
+        };
+
+        window.chgQty = function(q) { bQty += q; if(bQty<1) bQty=1; updM(); };
+        function updM() {
+            document.getElementById("mQty").innerHTML = bQty;
+            document.getElementById("mTotal").innerHTML = (bAmt * bQty).toFixed(2);
+        }
+
+        // 🚨 WAGERING SYNC ADDED HERE 🚨
+        window.confirmBet = function() {
+            var t = bAmt * bQty;
+            if(bal < t) { 
+                alert("Low Balance! Please deposit."); 
+                document.getElementById("betModal").style.display = "none";
+                return; 
+            }
+
+            if(!userDocId) { alert("Syncing... Try again in 2 seconds."); return; }
+
+            // Deduct balance AND Update wagerDone
+            fireDB.collection("users").doc(userDocId).update({
+                balance: firebase.firestore.FieldValue.increment(-t),
+                wagerDone: firebase.firestore.FieldValue.increment(t)
+            }).then(() => {
+                bal -= t;
+                document.getElementById("balance").innerHTML = bal.toFixed(2);
+                localStorage.setItem('r_bal', bal);
+                
+                myHist.unshift({p: curP, s: selBet, c: selCol, a: t, status: "pending", win: 0});
+                drawMy();
+                document.getElementById("betModal").style.display = "none";
+                alert("Bet Placed: ₹" + t);
+            }).catch(err => alert("Bet Error: Check Internet"));
+        };
+
+        function checkWin(period) {
+            var win = getRes(period);
+            var isB = win >= 5 ? "Big" : "Small";
+            var cName = "Red";
+            if(win==1||win==3||win==7||win==9) cName = "Green";
+            if(win==0) cName = "Red+Purple"; if(win==5) cName = "Green+Purple";
+
+            var tw = 0;
+            for(var i=0; i<myHist.length; i++){
+                if(myHist[i].p === period && myHist[i].status === "pending") {
+                    var won = false; var mult = 0; var netA = myHist[i].a * 0.98;
+                    
+                    if(myHist[i].s == win) { won=true; mult=9; }
+                    else if(myHist[i].s.toLowerCase() === isB.toLowerCase()) { won=true; mult=2; }
+                    else if(cName.indexOf(myHist[i].s) > -1 || (myHist[i].s=="Green" && (win==1||win==3||win==5||win==7||win==9)) || (myHist[i].s=="Red" && (win==0||win==2||win==4||win==6||win==8))) { won=true; mult=2; }
+
+                    if(won) { tw += (netA * mult); myHist[i].status = "success"; myHist[i].win = (netA * mult); } 
+                    else { myHist[i].status = "failed"; }
+                }
+            }
+            
+            if(tw > 0) { 
+                fireDB.collection("users").doc(userDocId).update({
+                    balance: firebase.firestore.FieldValue.increment(tw)
+                }).then(() => {
+                    syncCloudBalance();
+                    alert("Result: "+win+"\nYou Won ₹" + tw.toFixed(2)); 
+                });
+            }
+            drawMy();
+        }
+
+        function drawMy() {
+            var h = ""; 
+            for(var i=0; i<Math.min(myHist.length, 15); i++) {
+                var d = myHist[i];
+                var c = (d.status == 'success') ? '#1eb861' : (d.status == 'pending' ? '#f6c745' : '#ec4043');
+                var aTxt = (d.status == 'success') ? ("+₹"+d.win.toFixed(2)) : ("-₹"+d.a.toFixed(2));
+                h += "<div class='my-item'><div style='display:flex; gap:10px; align-items:center;'><div class='my-box' style='background:"+d.c+"'>"+d.s+"</div><b>"+d.p+"</b></div><div style='text-align:right;'><div style='font-size:10px; color:"+c+"; border:1px solid; padding:2px 5px; border-radius:10px; margin-bottom:5px;'>"+d.status+"</div><b style='color:"+c+"'>"+aTxt+"</b></div></div>";
+            }
+            document.getElementById("myBody").innerHTML = (h !== "") ? h : "No Data";
+        }
+
+        window.goTab = function(t) {
+            document.getElementById("v-rec").className = "content";
+            document.getElementById("v-my").className = "content";
+            document.getElementById("t1").className = "tab";
+            document.getElementById("t2").className = "tab";
+            document.getElementById("v-"+t).className = "content active";
+            document.getElementById(t=='rec'?'t1':'t2').className = "tab active";
+        };
+        
+        syncCloudBalance();
+        tick();
+        setInterval(tick, 1000);
+    </script>
+</body>
+</html>

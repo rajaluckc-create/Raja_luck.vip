@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIP System - Raja Luck VIP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* ORIGINAL CSS - NO CHANGES */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #141124; color: #ffffff; padding-bottom: 70px; overflow-x: hidden; }
+        .header { background: linear-gradient(135deg, #1e1b4b, #312e81); padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .header i { position: absolute; left: 15px; font-size: 20px; cursor: pointer; padding: 5px; color:#f6c745; }
+        .header-title { font-size: 18px; font-weight: 900; color: #f6c745; text-transform: uppercase;}
+        .container { padding: 15px; }
+        .vip-status-card { background: #201d36; border-radius: 15px; padding: 20px; text-align: center; border: 2px solid #f6c745; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); position: relative; overflow: hidden;}
+        .monthly-badge { position: absolute; top: 0; right: 0; background: #ff4757; color: white; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 0 13px 0 10px; }
+        .crown-icon { font-size: 40px; color: #f6c745; margin-bottom: 10px; text-shadow: 0 0 10px rgba(246, 199, 69, 0.5); }
+        .status-txt { font-size: 12px; color: #8b899c; margin-bottom: 5px; font-weight: bold; text-transform: uppercase;}
+        .total-bet { font-size: 30px; font-weight: bold; color: #f6c745; margin-bottom: 15px; }
+        .vip-timeline { position: relative; padding-left: 20px; }
+        .vip-timeline::before { content: ''; position: absolute; left: 0; top: 10px; width: 3px; height: 95%; background: rgba(246, 199, 69, 0.1); }
+        .tier-card { background: #201d36; border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 5px solid #2f3542; position: relative; }
+        .tier-card.unlocked { border-left-color: #ff4757; background: #2a2542; }
+        .tier-card.received { border-left-color: #2ed573; background: rgba(46, 213, 115, 0.05); opacity: 0.8;}
+        .tier-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px;}
+        .tier-icon { font-size: 22px; color: #8b899c; }
+        .unlocked .tier-icon { color: #f6c745; }
+        .tier-level { font-size: 16px; font-weight: bold; color: #fff; flex: 1;}
+        .reward-info { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05); }
+        .rew-row { display: flex; justify-content: space-between; font-size: 13px; color: #fff; margin-bottom: 5px;}
+        .rew-val { font-weight: bold; color: #f6c745; }
+        .prog-row { display: flex; justify-content: space-between; font-size: 10px; color: #8b899c; margin-bottom: 5px;}
+        .progress-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 15px;}
+        .progress-fill { height: 100%; background: #ffffff; width: 0%; transition: 0.5s; }
+        .unlocked .progress-fill { background: #f6c745; }
+        .btn-action { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 13px; cursor: pointer; text-transform: uppercase; }
+        .btn-locked { background: #2f3542; color: #8b899c; }
+        .btn-claimable { background: linear-gradient(135deg, #ff6b81, #ff4757); color: white; animation: pulse 1.5s infinite; }
+        .btn-claimed { background: rgba(46, 213, 115, 0.1); color: #2ed573; cursor: default; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); } }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="window.location.href='index.html'"></i>
+        <div class="header-title">VIP Rewards</div>
+    </div>
+
+    <div class="container">
+        
+        <div class="vip-status-card">
+            <div class="monthly-badge">MONTHLY</div>
+            <i class="fas fa-crown crown-icon"></i>
+            <div class="status-txt">Total Betting Required</div>
+            <div class="total-bet">₹<span id="displayTotalBet">0</span></div>
+            <div class="status-txt" style="color:#6c5ce7; font-size:10px;">Valid for Current Month Only</div>
+        </div>
+        
+        <div class="vip-timeline" id="vipTimelineList">
+            <p style="text-align:center; color:#8b899c;">Syncing VIP levels...</p>
+        </div>
+
+    </div>
+
+    <script>
+        // 🚨 FIREBASE SETUP 🚨
+        var firebaseConfig = { apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", authDomain: "ff-warzone-9c820.firebaseapp.com", projectId: "ff-warzone-9c820", storageBucket: "ff-warzone-9c820.firebasestorage.app", messagingSenderId: "267357764090", appId: "1:267357764090:web:0691111afd07cb0ff20c43" };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var fireDB = firebase.firestore();
+
+        var totalBetting = 0; 
+        var userDocId = "";
+        var userUid = localStorage.getItem("r_uid");
+        var claimedTiers = [];
+
+        // VIP CONFIG
+        const vipSettings = [
+            { id: 1, required: 3000, reward: 30 }, { id: 2, required: 10000, reward: 100 }, { id: 3, required: 30000, reward: 300 },
+            { id: 4, required: 60000, reward: 600 }, { id: 5, required: 100000, reward: 1000 }, { id: 6, required: 200000, reward: 2000 },
+            { id: 7, required: 500000, reward: 5000 }, { id: 8, required: 800000, reward: 8000 }, { id: 9, required: 1000000, reward: 10000 },
+            { id: 10, required: 1500000, reward: 15000 }, { id: 11, required: 2000000, reward: 20000 }, { id: 12, required: 3000000, reward: 30000 },
+            { id: 13, required: 5000000, reward: 50000 }, { id: 14, required: 8000000, reward: 80000 }, { id: 15, required: 10000000, reward: 100000 }
+        ];
+
+        // 🚨 CLOUD SYNC & MONTHLY RESET 🚨
+        function syncVIP() {
+            if(!userUid) return;
+            var d = new Date();
+            var currentMonthKey = d.getMonth() + "-" + d.getFullYear();
+
+            fireDB.collection("users").where("uid", "==", parseInt(userUid)).get().then((snap) => {
+                snap.forEach((doc) => {
+                    userDocId = doc.id;
+                    var data = doc.data();
+                    totalBetting = data.wagerDone || 0;
+                    document.getElementById("displayTotalBet").innerText = totalBetting.toFixed(2);
+
+                    // Check for Monthly Reset
+                    if (data.vipClaimMonth !== currentMonthKey) {
+                        claimedTiers = [];
+                        // Reset claims in background if month changed
+                        fireDB.collection("users").doc(userDocId).update({
+                            vipClaimMonth: currentMonthKey,
+                            claimedVIP: []
+                        });
+                    } else {
+                        claimedTiers = data.claimedVIP || [];
+                    }
+                    renderVIPTiers();
+                });
+            });
+        }
+
+        function renderVIPTiers() {
+            var html = "";
+            vipSettings.forEach(tier => {
+                var remaining = tier.required - totalBetting; if(remaining < 0) remaining = 0;
+                var percentage = (totalBetting / tier.required) * 100; if(percentage > 100) percentage = 100;
+                var isUnlocked = (totalBetting >= tier.required);
+                var isClaimed = claimedTiers.includes(tier.id);
+                var cardClass = "", btnClass = "btn-action btn-locked", btnText = "Pending", btnAction = "";
+
+                if(isClaimed) {
+                    cardClass = "received"; btnClass = "btn-action btn-claimed"; btnText = "<i class='fas fa-check'></i> Received for this month";
+                } else if(isUnlocked) {
+                    cardClass = "unlocked"; btnClass = "btn-action btn-claimable"; btnText = "RECEIVE ₹" + tier.reward;
+                    btnAction = `onclick="claimReward(${tier.id}, ${tier.reward})"`;
+                } else {
+                    btnText = "Wager ₹" + remaining.toLocaleString('en-IN') + " to Unlock";
+                }
+
+                html += `<div class="tier-card ${cardClass}">
+                    <div class="tier-header"><i class="fas fa-gem tier-icon"></i><div class="tier-level">VIP Level ${tier.id}</div></div>
+                    <div class="reward-info">
+                        <div class="rew-row">Required Bet: <strong>₹${tier.required.toLocaleString()}</strong></div>
+                        <div class="rew-row">Monthly Reward: <span class="rew-val">₹${tier.reward.toLocaleString()}</span></div>
+                    </div>
+                    <div class="prog-row"><span>Status</span><span>${percentage.toFixed(0)}%</span></div>
+                    <div class="progress-bg"><div class="progress-fill" style="width:${percentage}%"></div></div>
+                    <button class="${btnClass}" ${btnAction}>${btnText}</button>
+                </div>`;
+            });
+            document.getElementById("vipTimelineList").innerHTML = html;
+        }
+
+        function claimReward(tierId, rewardAmt) {
+            if(!userDocId) return;
+            if(!confirm(`Claim ₹${rewardAmt} VIP Reward? (3X Wagering applies)`)) return;
+
+            var extraWager = rewardAmt * 3;
+            fireDB.collection("users").doc(userDocId).update({
+                balance: firebase.firestore.FieldValue.increment(rewardAmt),
+                wagerTarget: firebase.firestore.FieldValue.increment(extraWager),
+                claimedVIP: firebase.firestore.FieldValue.arrayUnion(tierId)
+            }).then(() => {
+                alert("✅ VIP Reward Claimed!");
+                location.reload();
+            });
+        }
+
+        window.onload = syncVIP;
+    </script>
+</body>
+</html>

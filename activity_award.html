@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Activity Award - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        /* EXACT BACKGROUND GRADIENT FROM SCREENSHOT */
+        body { 
+            background: linear-gradient(180deg, #ff8c78 0%, #ffa588 30%, #fff0ec 60%, #fff0ec 100%); 
+            color: #333; 
+            padding-bottom: 40px; 
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .header { display: flex; align-items: center; justify-content: center; padding: 15px; position: sticky; top: 0; z-index: 100; }
+        .back-btn { position: absolute; left: 15px; width: 30px; height: 30px; background: rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; font-size: 16px; }
+        
+        /* GOLD RAJALUCK TEXT */
+        .header-title { font-size: 20px; font-weight: 900; background: linear-gradient(to bottom, #ffe884, #f6b93b); -webkit-background-clip: text; color: transparent; display: flex; align-items: center; gap: 5px; text-shadow: 0px 2px 4px rgba(0,0,0,0.1); letter-spacing: 1px;}
+        .header-title i { color: #f1c40f; text-shadow: none; }
+
+        /* HERO TEXT AREA */
+        .hero-section { padding: 10px 20px; color: white; }
+        .hero-title { font-size: 15px; font-weight: 500; margin-bottom: 5px; }
+        .hero-stars { font-size: 13px; line-height: 1.5; opacity: 0.9; margin-bottom: 25px; }
+        
+        .amount-lbl { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+        .amount-val { font-size: 42px; font-weight: 900; font-style: italic; letter-spacing: 2px; text-shadow: 2px 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        
+        /* SEMI-TRANSPARENT INFO BOX */
+        .glass-box { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(5px); border-radius: 10px; padding: 15px; font-size: 11px; line-height: 1.5; color: white; max-width: 85%; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+
+        /* WHITE CARD (My Bonus) */
+        .card-container { padding: 0 15px; margin-top: 25px; }
+        .white-card { background: white; border-radius: 15px; padding: 25px 20px; text-align: center; box-shadow: 0 8px 20px rgba(255, 140, 120, 0.15); }
+        .wc-title { font-size: 16px; font-weight: 500; color: #333; margin-bottom: 15px; }
+        
+        /* PEACH INNER BOX */
+        .inner-peach-box { background: #fdf1ed; color: #a06b5b; padding: 15px; border-radius: 8px; font-size: 13px; line-height: 1.5; text-align: left; margin-bottom: 20px; }
+
+        /* SHARE BUTTON */
+        .btn-share { width: 100%; background: linear-gradient(90deg, #ff8e53, #ff6b6b); color: white; border: none; padding: 14px; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4); transition: 0.2s;}
+        .btn-share:active { transform: scale(0.97); }
+
+        /* RULE DESCRIPTION SECTION */
+        .rules-container { padding: 25px 20px; }
+        .rule-title { display: flex; align-items: center; font-size: 15px; font-weight: 900; color: #333; margin-bottom: 15px; gap: 8px;}
+        .red-bar { width: 4px; height: 16px; background: #ff4757; border-radius: 2px; }
+        
+        .rule-list { list-style: none; }
+        .rule-list li { position: relative; padding-left: 15px; font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 12px; }
+        .rule-list li::before { content: ''; position: absolute; left: 0; top: 8px; width: 5px; height: 5px; background: #ff6b6b; border-radius: 50%; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="back-btn" onclick="window.history.back()"><i class="fas fa-chevron-left"></i></div>
+        <div class="header-title"><i class="fas fa-crown"></i> RAJALUCK</div>
+    </div>
+
+    <div class="hero-section">
+        <div class="hero-title">Daily Mystery Reward</div>
+        <div class="hero-stars">
+            ★Invite friends to play together and share the daily mystery reward.<br>
+            ★Make every day full of surprises.
+        </div>
+
+        <div class="amount-lbl">Daily Bonus Amount</div>
+        <div class="amount-val">₹2388888</div>
+
+        <div class="glass-box">
+            Generous bonuses await sharing every day. Invite friends to join the game and receive mystery bonuses, each surprise is different. Bonuses will be revealed by 10 AM the next day at the latest. Good luck!
+        </div>
+    </div>
+
+    <div class="card-container">
+        <div class="white-card">
+            <div class="wc-title">My Bonus</div>
+            <div class="inner-peach-box">
+                You have not brought valid subordinates recently, bonus cannot be calculated. Continue bringing new subordinates to participate in the event. All active actions of your subordinates are related to you, and bonuses will only be higher.
+            </div>
+            <button class="btn-share" onclick="shareWithFriends()">Share with Friends</button>
+        </div>
+    </div>
+
+    <div class="rules-container">
+        <div class="rule-title">
+            <div class="red-bar"></div>
+            ★Rule Description:
+        </div>
+        <ul class="rule-list">
+            <li>1. Daily mystery bonus pool: Total ₹2388888.</li>
+            <li>2. Daily bonuses are limited, but do not worry if you miss out - this is an ongoing event and you can participate every day.</li>
+            <li>3. Share and invite friends to join the game every day to participate in the daily mystery reward event.</li>
+            <li>4. Hard work is rewarded with mystery bonuses. Bonuses will be announced the next day. Good luck!</li>
+            <li>5. We reserve the right to modify, change, or cancel this promotion without prior notice; applies to promotions.</li>
+            <li>6. Mystery bonus requires 0 to 3 times the bet amount as wagering, adding a mystery element (up to 3x).</li>
+        </ul>
+    </div>
+
+    <script>
+        // शेयर बटन की असली वर्किंग (Working Share Button)
+        function shareWithFriends() {
+            var myCode = localStorage.getItem("r_my_invite_code") || "bIgCG75627";
+            var shareLink = "https://rajaluck.vip/register.html?invite=" + myCode;
+            
+            // अगर मोबाइल में असली शेयर का ऑप्शन सपोर्टेड है (WhatsApp/Telegram के लिए)
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Join Raja Luck VIP',
+                    text: 'Play games and earn mystery bonuses with me! Use my invite code: ' + myCode,
+                    url: shareLink
+                }).catch(console.error);
+            } else {
+                // अगर PC या पुराने मोबाइल में है, तो लिंक कॉपी हो जाएगा
+                navigator.clipboard.writeText(shareLink);
+                alert("✅ Link Copied! Send it to your friends on WhatsApp or Telegram.\n" + shareLink);
+            }
+        }
+    </script>
+</body>
+</html>

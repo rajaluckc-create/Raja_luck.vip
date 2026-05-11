@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Change Language - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f5f5f9; color: #333; padding-bottom: 30px; }
+
+        /* HEADER */
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header i { position: absolute; left: 15px; font-size: 20px; cursor: pointer; padding: 5px; }
+        .header-title { font-size: 18px; font-weight: bold; }
+
+        /* CONTAINER */
+        .container { padding: 20px 15px; }
+
+        /* LANGUAGE CARD */
+        .lang-card { background: white; border-radius: 12px; padding: 18px 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 1px solid transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition: 0.2s; }
+        
+        /* ACTIVE STATE */
+        .lang-card.active { background: #f0edff; border-color: #6c5ce7; }
+
+        .lang-info { display: flex; align-items: center; gap: 15px; font-size: 16px; font-weight: bold; color: #2f3542; }
+        
+        .flag { font-size: 20px; }
+
+        /* CHECK ICON */
+        .check-icon { font-size: 22px; color: #dfe4ea; transition: 0.2s; }
+        .lang-card.active .check-icon { color: #6c5ce7; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="window.history.back()"></i>
+        <div class="header-title">Change language</div>
+    </div>
+
+    <div class="container" id="langList">
+        
+        <div class="lang-card" data-lang="EN" onclick="selectLang(this)">
+            <div class="lang-info">
+                <span class="flag">🇺🇸</span> EN
+            </div>
+            <i class="far fa-circle check-icon"></i>
+        </div>
+
+        <div class="lang-card" data-lang="HI" onclick="selectLang(this)">
+            <div class="lang-info">
+                <span class="flag">🇮🇳</span> हिंदी
+            </div>
+            <i class="far fa-circle check-icon"></i>
+        </div>
+
+        <div class="lang-card" data-lang="BN" onclick="selectLang(this)">
+            <div class="lang-info">
+                <span class="flag">🇮🇳</span> বাংলা
+            </div>
+            <i class="far fa-circle check-icon"></i>
+        </div>
+
+        <div class="lang-card" data-lang="TE" onclick="selectLang(this)">
+            <div class="lang-info">
+                <span class="flag">🇮🇳</span> తెలుగు
+            </div>
+            <i class="far fa-circle check-icon"></i>
+        </div>
+
+        <div class="lang-card" data-lang="MR" onclick="selectLang(this)">
+            <div class="lang-info">
+                <span class="flag">🇮🇳</span> मराठी
+            </div>
+            <i class="far fa-circle check-icon"></i>
+        </div>
+
+        <div class="lang-card" data-lang="TA" onclick="selectLang(this)">
+            <div class="lang-info">
+                <span class="flag">🇮🇳</span> தமிழ்
+            </div>
+            <i class="far fa-circle check-icon"></i>
+        </div>
+
+        <div class="lang-card" data-lang="UR" onclick="selectLang(this)">
+            <div class="lang-info">
+                <span class="flag">🇮🇳</span> اردو
+            </div>
+            <i class="far fa-circle check-icon"></i>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. पेज लोड होते ही पुरानी सेव की हुई भाषा चेक करें
+        function initLanguage() {
+            var savedLang = localStorage.getItem("r_app_lang") || "EN"; // Default EN है
+            
+            var cards = document.querySelectorAll(".lang-card");
+            cards.forEach(card => {
+                var langCode = card.getAttribute("data-lang");
+                var icon = card.querySelector(".check-icon");
+                
+                if(langCode === savedLang) {
+                    card.classList.add("active");
+                    icon.classList.remove("far", "fa-circle");
+                    icon.classList.add("fas", "fa-check-circle");
+                } else {
+                    card.classList.remove("active");
+                    icon.classList.remove("fas", "fa-check-circle");
+                    icon.classList.add("far", "fa-circle");
+                }
+            });
+        }
+
+        // 2. जब यूज़र किसी भाषा पर क्लिक करे
+        function selectLang(clickedCard) {
+            var selectedLangCode = clickedCard.getAttribute("data-lang");
+            var langName = clickedCard.innerText.trim().replace(/[\uD83C-\uDBFF\uDC00-\uDFFF]+/g, ''); // झंडा हटाकर सिर्फ नाम लें
+
+            // पुरानी एक्टिव क्लास हटाओ
+            var cards = document.querySelectorAll(".lang-card");
+            cards.forEach(card => {
+                card.classList.remove("active");
+                var icon = card.querySelector(".check-icon");
+                icon.classList.remove("fas", "fa-check-circle");
+                icon.classList.add("far", "fa-circle");
+            });
+
+            // नई पर एक्टिव क्लास लगाओ
+            clickedCard.classList.add("active");
+            var clickedIcon = clickedCard.querySelector(".check-icon");
+            clickedIcon.classList.remove("far", "fa-circle");
+            clickedIcon.classList.add("fas", "fa-check-circle");
+
+            // 🚨 मेमोरी में सेव करो 🚨
+            localStorage.setItem("r_app_lang", selectedLangCode);
+
+            // यूज़र को मैसेज दिखाओ और वापस 'My' पेज पर भेजो
+            setTimeout(() => {
+                alert("Language changed to " + langName + " Successfully!");
+                window.history.back(); // पीछे वाले पेज पर भेज देगा
+            }, 300); // 0.3 सेकंड का डिले ताकि एनिमेशन दिख सके
+        }
+
+        // चालू करो
+        initLanguage();
+    </script>
+</body>
+</html>

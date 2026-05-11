@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Withdrawal History - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f7f8fc; color: #333; }
+
+        /* HEADER */
+        .header { background: linear-gradient(135deg, #6c5ce7, #a29bfe); padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.2); }
+        .header i { position: absolute; left: 15px; font-size: 20px; cursor: pointer; padding: 5px; }
+        .header-title { font-size: 18px; font-weight: bold; letter-spacing: 0.5px; }
+
+        .container { padding: 15px; padding-bottom: 30px; }
+
+        /* RECORD CARD */
+        .record-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; overflow: hidden; border-left: 4px solid #f1c40f; }
+        
+        /* Status Colors */
+        .record-card.success { border-left-color: #2ed573; }
+        .record-card.rejected { border-left-color: #ff4757; }
+
+        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #f1f2f6; padding-bottom: 10px;}
+        .type-badge { font-size: 12px; font-weight: bold; color: #2f3542; display: flex; align-items: center; gap: 5px;}
+        .type-badge i { color: #6c5ce7; background: #f0edff; padding: 5px; border-radius: 5px; font-size: 14px;}
+        
+        .status { font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 20px; }
+        .status.pending { background: #fff8e1; color: #f39c12; }
+        .status.success { background: #e8f8f5; color: #2ecc71; }
+        .status.rejected { background: #fdedec; color: #e74c3c; }
+
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; color: #747d8c; }
+        .detail-row strong { color: #2f3542; font-size: 14px; }
+        
+        .amount-text { font-size: 18px; font-weight: 900; color: #ff4757; }
+
+        .empty-state { text-align: center; margin-top: 50px; color: #a4b0be; }
+        .empty-state i { font-size: 50px; margin-bottom: 15px; opacity: 0.5; }
+        .empty-state p { font-size: 14px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="window.history.back()"></i>
+        <div class="header-title">Withdrawal Record</div>
+    </div>
+
+    <div class="container" id="historyContainer">
+        <div class="empty-state">
+            <p>Loading records...</p>
+        </div>
+    </div>
+
+    <script>
+        // 🚨 FIREBASE SETUP 🚨
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        var fireDB = firebase.firestore();
+
+        function loadHistory() {
+            var savedUid = localStorage.getItem("r_uid");
+            var container = document.getElementById("historyContainer");
+
+            if(!savedUid) {
+                container.innerHTML = `<div class="empty-state"><p>Please login first.</p></div>`;
+                return;
+            }
+
+            // 🚨 सीधा Firebase से डेटा उठाना (Live Update के साथ) 🚨
+            fireDB.collection("withdraws")
+                .where("uid", "==", parseInt(savedUid))
+                .orderBy("timestamp", "desc")
+                .onSnapshot((snapshot) => {
+                    var html = "";
+                    if(snapshot.empty) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-receipt"></i>
+                                <p>No withdrawal records found.</p>
+                            </div>`;
+                        return;
+                    }
+
+                    snapshot.forEach((doc) => {
+                        var req = doc.data();
+                        var statusClass = "pending";
+                        var statusText = "Pending";
+                        var cardClass = "";
+
+                        // Admin Status Sync
+                        if(req.status === "Paid" || req.status === "Approved") {
+                            statusClass = "success";
+                            statusText = "Success";
+                            cardClass = "success";
+                        } else if(req.status === "Rejected") {
+                            statusClass = "rejected";
+                            statusText = "Failed/Refunded";
+                            cardClass = "rejected";
+                        }
+
+                        // Tax Calculation (आपका ओरिजिनल 2% नियम)
+                        var tax = (req.amt * 0.02).toFixed(2);
+                        var finalAmt = (req.amt - tax).toFixed(2);
+
+                        html += `
+                            <div class="record-card ${cardClass}">
+                                <div class="top-row">
+                                    <div class="type-badge"><i class="fas fa-university"></i> Bank Withdrawal</div>
+                                    <div class="status ${statusClass}">${statusText}</div>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Withdrawal Amount:</span>
+                                    <span class="amount-text">-₹${req.amt}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Admin Tax (2%):</span>
+                                    <span>₹${tax}</span>
+                                </div>
+                                <div class="detail-row" style="margin-top:5px; padding-top:5px; border-top:1px dashed #f1f2f6;">
+                                    <span>Actual Received:</span>
+                                    <strong style="color:#2ecc71;">₹${finalAmt}</strong>
+                                </div>
+                                <div class="detail-row" style="margin-top: 10px; font-size: 10px;">
+                                    <span>Time:</span>
+                                    <span>${req.time}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                }, (error) => {
+                    console.error("Firebase Error: ", error);
+                    container.innerHTML = `<div class="empty-state"><p>Error loading records.</p></div>`;
+                });
+        }
+
+        // लोड फंक्शन कॉल
+        loadHistory();
+    </script>
+</body>
+</html>

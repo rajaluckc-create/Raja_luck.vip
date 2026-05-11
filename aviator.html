@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aviator - Raja Luck</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* 🚨 AVIATOR DARK THEME - NO CHANGES 🚨 */
+        body { margin: 0; padding: 0; background-color: #000000; color: #ffffff; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden;}
+        
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; background-color: #1a1a1a; border-bottom: 1px solid #333; }
+        .logo { font-size: 24px; font-weight: 900; color: #e74c3c; font-style: italic; font-family: 'Impact', sans-serif; letter-spacing: 1px;}
+        .bal-box { font-size: 14px; font-weight: bold; color: #2ecc71; }
+        
+        .history { display: flex; gap: 8px; padding: 8px 10px; overflow-x: hidden; background: #000; white-space: nowrap; border-bottom: 1px solid #222;}
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; background: #1a1a1a; }
+        .b-blue { color: #3498db; } .b-purple { color: #9b59b6; } .b-pink { color: #e84393; }
+
+        .game-area { height: 260px; background: #0a0a0a; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; border-radius: 10px; margin: 10px;}
+        
+        .multiplier-text { font-size: 75px; font-weight: 900; font-family: 'Arial Black', sans-serif; z-index: 10; text-shadow: 0 0 15px rgba(0,0,0,0.9); transition: 0.1s; letter-spacing: -2px;}
+        .crashed-text { color: #e74c3c !important; }
+        
+        .status-box { position: absolute; width: 100%; top: 40%; transform: translateY(-50%); text-align: center; z-index: 20;}
+        .loading-bar { width: 180px; height: 4px; background: #333; margin: 10px auto; border-radius: 5px; overflow: hidden; }
+        .loading-fill { height: 100%; background: #e74c3c; width: 0%; transition: width 0.1s linear;}
+        
+        #flightContainer { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; display: none; z-index: 5;}
+        #curveArea { position: absolute; bottom: -10px; left: -10px; width: 0; height: 0; background: linear-gradient(135deg, #e74c3c 0%, #900000 100%); border-top-right-radius: 100%; opacity: 0.8; border-top: 3px solid #ff7675;}
+        #plane { position: absolute; bottom: 0; left: 0; width: 70px; height: auto; z-index: 6; fill: #e74c3c;}
+
+        .controls { padding: 0 10px; }
+        .bet-panel { background: #1a1a1a; border-radius: 10px; padding: 12px; margin-bottom: 10px; border: 1px solid #2a2a2a; }
+        .panel-flex { display: flex; align-items: center; gap: 10px;}
+        .bet-left { flex: 1.2; display: flex; flex-direction: column; gap: 8px;}
+        .input-row { display: flex; justify-content: space-between; align-items: center; background: #000; border-radius: 8px; padding: 2px; border: 1px solid #333;}
+        .btn-pm { background: transparent; border: none; color: #aaa; font-size: 22px; padding: 5px 12px; cursor: pointer; }
+        .bet-input { background: transparent; border: none; color: #fff; font-size: 16px; font-weight: bold; text-align: center; width: 100%; outline: none; }
+        .quick-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+        .q-btn { background: #000; border: 1px solid #333; color: #aaa; padding: 6px 0; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .bet-right { flex: 1; }
+        .action-btn { width: 100%; height: 75px; border: none; border-radius: 10px; font-size: 20px; font-weight: 900; text-transform: uppercase; cursor: pointer; color: white; transition: 0.1s;}
+        
+        .btn-bet { background: #2ecc71; box-shadow: 0 4px 0 #27ae60; }
+        .btn-cashout { background: #e67e22; box-shadow: 0 4px 0 #d35400; }
+        .btn-waiting { background: #e74c3c; box-shadow: 0 4px 0 #c0392b; }
+        .c-sub { font-size: 13px; font-weight: normal; display: block; margin-top: 2px;}
+
+        .fake-bets { background: #000; padding: 10px 15px; font-size: 12px; border-top: 1px solid #222;}
+        .fb-header { display: flex; justify-content: space-between; color: #666; margin-bottom: 8px; font-weight: bold;}
+        .fb-row { display: flex; justify-content: space-between; padding: 8px 5px; border-bottom: 1px solid #111; margin-bottom: 2px; align-items: center; border-radius: 4px; transition: background 0.3s;}
+        .usr { display: flex; align-items: center; gap: 6px; color: #ccc;}
+        .w-text { color: #2ecc71; font-weight: bold;}
+        .fb-won-bg { background: rgba(46, 204, 113, 0.1) !important; border: 1px solid rgba(46, 204, 113, 0.3); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div onclick="window.history.back()" style="font-size:24px; cursor:pointer; color:#888;">&lsaquo;</div>
+        <div class="logo">Aviator</div>
+        <div class="bal-box"><span id="balance">0.00</span> INR ≡</div>
+    </div>
+
+    <div class="history" id="historyBox"></div>
+
+    <div class="game-area">
+        <div class="status-box" id="statusBox">
+            <div style="font-size: 18px; font-weight: bold; color:#e74c3c;">WAITING FOR NEXT ROUND</div>
+            <div class="loading-bar"><div class="loading-fill" id="loadFill"></div></div>
+        </div>
+        <div class="multiplier-text" id="multiplier" style="display:none;">1.00x</div>
+        <div id="flightContainer">
+            <div id="curveArea"></div>
+            <svg id="plane" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <path d="M85.4,36.5 L60.2,42.1 L42.5,75.4 L28.3,75.4 L37.8,47.2 L17.5,51.8 L9.4,62.3 L2.5,62.3 L7.5,47.2 L2.5,32 L9.4,32 L17.5,42.5 L37.8,47.2 L64.1,15.5 L78.3,15.5 L67.8,40.5 Z" />
+            </svg>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="bet-panel">
+            <div class="panel-flex">
+                <div class="bet-left">
+                    <div class="input-row">
+                        <button class="btn-pm" onclick="chgBet(1, -10)">-</button>
+                        <input type="number" id="betInput1" class="bet-input" value="10.00" onkeyup="manualBet(1)">
+                        <button class="btn-pm" onclick="chgBet(1, 10)">+</button>
+                    </div>
+                    <div class="quick-row">
+                        <button class="q-btn" onclick="setBet(1, 100)">100.00</button>
+                        <button class="q-btn" onclick="setBet(1, 500)">500.00</button>
+                    </div>
+                </div>
+                <div class="bet-right">
+                    <button class="action-btn btn-bet" id="actionBtn1" onclick="handleAction(1)">
+                        BET<span class="c-sub" id="btnSub1">10.00 INR</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="bet-panel">
+            <div class="panel-flex">
+                <div class="bet-left">
+                    <div class="input-row">
+                        <button class="btn-pm" onclick="chgBet(2, -10)">-</button>
+                        <input type="number" id="betInput2" class="bet-input" value="10.00" onkeyup="manualBet(2)">
+                        <button class="btn-pm" onclick="chgBet(2, 10)">+</button>
+                    </div>
+                    <div class="quick-row">
+                        <button class="q-btn" onclick="setBet(2, 100)">100.00</button>
+                        <button class="q-btn" onclick="setBet(2, 500)">500.00</button>
+                    </div>
+                </div>
+                <div class="bet-right">
+                    <button class="action-btn btn-bet" id="actionBtn2" onclick="handleAction(2)">
+                        BET<span class="c-sub" id="btnSub2">10.00 INR</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="fake-bets">
+        <div style="color: #fff; font-weight: bold; margin-bottom: 10px;">All Bets <span style="color:#2ecc71; margin-left:10px;">1024/1354</span></div>
+        <div class="fb-header"><span>Player</span><span>Bet INR</span><span>X</span><span>Win INR</span></div>
+        <div id="fakeList"></div>
+    </div>
+
+    <script>
+        // 🚨 1. FIREBASE SETUP (INTEGRATED) 🚨
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var fireDB = firebase.firestore();
+        var userDocId = ""; 
+
+        var bal = 0.00; 
+
+        // 🚨 2. LIVE CLOUD SYNC 🚨
+        function syncCloudBalance() {
+            var savedUid = localStorage.getItem("r_uid");
+            if(!savedUid) return;
+
+            fireDB.collection("users").where("uid", "==", parseInt(savedUid)).get().then((snapshot) => {
+                snapshot.forEach((doc) => {
+                    userDocId = doc.id;
+                    var data = doc.data();
+                    bal = data.balance || 0;
+                    document.getElementById("balance").innerText = bal.toFixed(2);
+                    localStorage.setItem('r_bal', bal);
+                });
+            }).catch(err => console.log("Balance Sync Error"));
+        }
+
+        // Game State
+        var state = "WAITING"; var mult = 1.00; var crashAt = 1.00;
+        var flightInt, loadInt; var pX = 0, pY = 0;
+        var bets = { 1: { amt: 10, st: "NONE", win: 0 }, 2: { amt: 10, st: "NONE", win: 0 } };
+
+        // ORIGINAL RIGGED LOGIC (UNTOUCHED)
+        function getCrashPoint() {
+            var hasBet = (bets[1].st === "PLACED" || bets[2].st === "PLACED");
+            if (!hasBet) { return parseFloat((3.00 + Math.random() * 20.00).toFixed(2)); }
+            var currentLossStreak = Number(localStorage.getItem('av_streak') || 0);
+            var targetLosses = Number(localStorage.getItem('av_target') || Math.floor(Math.random() * 3) + 2);
+            if (currentLossStreak >= targetLosses) {
+                localStorage.setItem('av_streak', 0);
+                localStorage.setItem('av_target', Math.floor(Math.random() * 4) + 1);
+                return parseFloat((2.00 + Math.random() * 2.50).toFixed(2)); 
+            } else {
+                localStorage.setItem('av_streak', currentLossStreak + 1);
+                localStorage.setItem('av_target', targetLosses);
+                return parseFloat((1.00 + (Math.random() * 0.40)).toFixed(2)); 
+            }
+        }
+
+        // --- LIVE FAKE BETS SYSTEM ---
+        var liveFakeBets = [];
+        function initFakeBets() {
+            liveFakeBets = []; var h = "";
+            for(var i=0; i<6; i++) {
+                var ba = (Math.floor(Math.random() * 100) + 2) * 10;
+                var targetX = (1.10 + Math.random() * 5.00).toFixed(2);
+                liveFakeBets.push({ id: i, name: "u***" + Math.floor(Math.random()*9), bet: ba, target: parseFloat(targetX), cashed: false });
+                h += `<div class="fb-row" id="fbRow${i}"><div class="usr"><span style="font-size:16px;">👤</span> ${liveFakeBets[i].name}</div><span>${ba.toFixed(2)}</span><span id="fbX${i}">-</span><span id="fbWin${i}">-</span></div>`;
+            }
+            document.getElementById("fakeList").innerHTML = h;
+        }
+
+        function updateFakeBets(currentM) {
+            for(var i=0; i<liveFakeBets.length; i++) {
+                var b = liveFakeBets[i];
+                if (!b.cashed && currentM >= b.target) {
+                    b.cashed = true;
+                    var row = document.getElementById("fbRow" + i);
+                    row.classList.add("fb-won-bg");
+                    document.getElementById("fbX" + i).innerHTML = `<span style="color:#3498db">${b.target}x</span>`;
+                    document.getElementById("fbWin" + i).innerHTML = `<span class="w-text">${(b.bet * b.target).toFixed(2)}</span>`;
+                }
+            }
+        }
+
+        // --- ENGINE ---
+        function startWaiting() {
+            state = "WAITING"; mult = 1.00;
+            document.getElementById("flightContainer").style.display = "none";
+            document.getElementById("multiplier").style.display = "none";
+            document.getElementById("multiplier").className = "multiplier-text";
+            document.getElementById("statusBox").style.display = "block";
+            if(bets[1].st === "WON") bets[1].st = "NONE";
+            if(bets[2].st === "WON") bets[2].st = "NONE";
+            updateBtn(1); updateBtn(2); initFakeBets(); syncCloudBalance();
+            var w = 0;
+            loadInt = setInterval(function() {
+                w += 2; document.getElementById("loadFill").style.width = w + "%";
+                if(w >= 100) { clearInterval(loadInt); takeOff(); }
+            }, 100);
+        }
+
+        function takeOff() {
+            state = "FLYING"; document.getElementById("statusBox").style.display = "none";
+            document.getElementById("multiplier").style.display = "block";
+            document.getElementById("flightContainer").style.display = "block";
+            crashAt = getCrashPoint(); pX = 0; pY = 0;
+            if(bets[1].st === "PLACED") bets[1].st = "FLYING";
+            if(bets[2].st === "PLACED") bets[2].st = "FLYING";
+            updateBtn(1); updateBtn(2);
+            flightInt = setInterval(function() {
+                mult += 0.003 + (mult * 0.001);
+                if(pX < window.innerWidth * 0.7) pX += 2.5; 
+                if(pY < 140) pY += pX * 0.008; 
+                document.getElementById("plane").style.transform = `translate(${pX}px, -${pY}px) rotate(-15deg)`;
+                document.getElementById("curveArea").style.width = (pX + 35) + "px";
+                document.getElementById("curveArea").style.height = (pY + 35) + "px";
+                if (mult >= crashAt) { mult = crashAt; crashPlane(); } 
+                else {
+                    document.getElementById("multiplier").innerText = mult.toFixed(2) + "x";
+                    if(bets[1].st === "FLYING") document.getElementById("btnSub1").innerText = (bets[1].amt * mult).toFixed(2) + " INR";
+                    if(bets[2].st === "FLYING") document.getElementById("btnSub2").innerText = (bets[2].amt * mult).toFixed(2) + " INR";
+                    updateFakeBets(mult);
+                }
+            }, 50);
+        }
+
+        function crashPlane() {
+            clearInterval(flightInt); state = "CRASHED";
+            document.getElementById("multiplier").innerText = "FLEW AWAY!\n" + mult.toFixed(2) + "x";
+            document.getElementById("multiplier").className = "multiplier-text crashed-text";
+            document.getElementById("plane").style.transform = `translate(${pX + 30}px, 200px) rotate(60deg)`;
+            if(bets[1].st === "FLYING") bets[1].st = "NONE";
+            if(bets[2].st === "FLYING") bets[2].st = "NONE";
+            updateBtn(1); updateBtn(2); addHist(mult); setTimeout(startWaiting, 3000); 
+        }
+
+        window.manualBet = function(p) {
+            var val = parseFloat(document.getElementById("betInput" + p).value);
+            if(isNaN(val) || val < 10) val = 10; bets[p].amt = val;
+            if(bets[p].st === "NONE") document.getElementById("btnSub" + p).innerText = val.toFixed(2) + " INR";
+        }
+        window.chgBet = function(p, v) { 
+            bets[p].amt += v; if(bets[p].amt < 10) bets[p].amt = 10;
+            document.getElementById("betInput" + p).value = bets[p].amt.toFixed(2);
+            if(bets[p].st === "NONE") document.getElementById("btnSub" + p).innerText = bets[p].amt.toFixed(2) + " INR";
+        }
+        window.setBet = function(p, v) {
+            bets[p].amt = v; document.getElementById("betInput" + p).value = v.toFixed(2);
+            if(bets[p].st === "NONE") document.getElementById("btnSub" + p).innerText = v.toFixed(2) + " INR";
+        }
+
+        // 🚨 3. SECURE ACTION HANDLER (CLOUD UPDATES) 🚨
+        window.handleAction = function(p) {
+            var b = bets[p];
+            if (b.st === "NONE") {
+                if(bal < b.amt) { alert("Low Balance!"); return; }
+                if(!userDocId) return alert("Syncing... try again.");
+                
+                // Deduct from Firebase
+                fireDB.collection("users").doc(userDocId).update({
+                    balance: firebase.firestore.FieldValue.increment(-b.amt)
+                }).then(() => {
+                    bal -= b.amt; document.getElementById("balance").innerText = bal.toFixed(2);
+                    localStorage.setItem('r_bal', bal); b.st = "PLACED"; updateBtn(p);
+                }).catch(err => alert("Bet Error"));
+
+            } else if (b.st === "PLACED" && state === "WAITING") {
+                // Cancel Bet & Refund Firebase
+                fireDB.collection("users").doc(userDocId).update({
+                    balance: firebase.firestore.FieldValue.increment(b.amt)
+                }).then(() => {
+                    bal += b.amt; document.getElementById("balance").innerText = bal.toFixed(2);
+                    localStorage.setItem('r_bal', bal); b.st = "NONE"; updateBtn(p);
+                });
+
+            } else if (b.st === "FLYING") {
+                var win = b.amt * mult;
+                // Cashout & Update Firebase
+                fireDB.collection("users").doc(userDocId).update({
+                    balance: firebase.firestore.FieldValue.increment(win)
+                }).then(() => {
+                    bal += win; document.getElementById("balance").innerText = bal.toFixed(2);
+                    localStorage.setItem('r_bal', bal); b.st = "WON"; b.win = win; updateBtn(p);
+                });
+            }
+        }
+
+        function updateBtn(p) {
+            var btn = document.getElementById("actionBtn" + p);
+            var b = bets[p];
+            if (b.st === "NONE") { btn.className = "action-btn btn-bet"; btn.innerHTML = `BET<span class="c-sub" id="btnSub${p}">${b.amt.toFixed(2)} INR</span>`; }
+            else if (b.st === "PLACED") { btn.className = "action-btn btn-waiting"; btn.innerHTML = `CANCEL<span class="c-sub">Waiting...</span>`; }
+            else if (b.st === "FLYING") { btn.className = "action-btn btn-cashout"; btn.innerHTML = `CASHOUT<span class="c-sub" id="btnSub${p}">${(b.amt * mult).toFixed(2)} INR</span>`; }
+            else if (b.st === "WON") { btn.className = "action-btn btn-waiting"; btn.style.opacity = "0.5"; btn.innerHTML = `WON<span class="c-sub">${b.win.toFixed(2)}</span>`; }
+        }
+
+        function addHist(m) {
+            var bx = document.getElementById("historyBox");
+            var col = m > 10 ? "b-pink" : (m > 2 ? "b-purple" : "b-blue");
+            bx.innerHTML = `<span class="badge ${col}">${m.toFixed(2)}x</span>` + bx.innerHTML;
+        }
+
+        window.onload = function() { syncCloudBalance(); startWaiting(); };
+    </script>
+</body>
+</html>

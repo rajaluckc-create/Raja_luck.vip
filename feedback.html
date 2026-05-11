@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Feedback - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f8f9fc; color: #333; padding-bottom: 30px; }
+
+        /* HEADER */
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; height: 60px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+        .header i { position: absolute; left: 15px; font-size: 20px; cursor: pointer; padding: 5px; }
+        .header-title { font-size: 18px; font-weight: bold; }
+
+        .container { padding: 20px 15px; }
+
+        /* TEXTAREA BOX */
+        .feedback-wrapper { background: white; border-radius: 15px; padding: 5px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-top: 3px solid #f1c40f; }
+        
+        .feedback-input { width: 100%; min-height: 220px; background: transparent; border: none; padding: 15px; font-size: 13px; line-height: 1.6; color: #2f3542; outline: none; resize: none; font-weight: 500;}
+        .feedback-input::placeholder { color: #b2bec3; font-weight: normal; }
+
+        /* REWARD TEXT */
+        .reward-text { text-align: center; color: #747d8c; font-size: 14px; line-height: 1.5; margin-bottom: 25px; font-weight: 500;}
+
+        /* ILLUSTRATION AREA (Using Icons) */
+        .illustration-box { text-align: center; margin-bottom: 40px; position: relative; height: 120px; display: flex; align-items: center; justify-content: center; }
+        .illustration-box .bg-shape { position: absolute; width: 150px; height: 50px; background: #f1f2f6; border-radius: 50%; bottom: 10px; z-index: 1;}
+        .illustration-box i { position: relative; z-index: 2; }
+        .bot-icon { font-size: 60px; color: #3b236d; margin-right: 15px; animation: float 3s ease-in-out infinite; }
+        .gift-icon { font-size: 40px; color: #f1c40f; animation: float 3s ease-in-out infinite 0.5s; }
+        .sparkle-icon { position: absolute; color: #2ed573; font-size: 15px; top: 20px; right: 80px; animation: blink 1.5s infinite; }
+
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        @keyframes blink { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
+
+        /* SUBMIT BUTTON */
+        .btn-submit { width: 100%; background: linear-gradient(135deg, #7b4397, #6c5ce7); color: white; border: none; padding: 16px; border-radius: 30px; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); transition: 0.2s; }
+        .btn-submit:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3); }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="window.history.back()"></i>
+        <div class="header-title">Feedback</div>
+    </div>
+
+    <div class="container">
+        
+        <div class="feedback-wrapper">
+            <textarea id="feedbackText" class="feedback-input" placeholder="welcome to feedback, please include feedback-please describe the problem in detail when giving feedback, preferably attach a screenshot of the problem interface, we will process your submitted feedback quickly!"></textarea>
+        </div>
+
+        <div class="reward-text">
+            Provide useful feedback<br>
+            Chance to Win Mystery Rewards
+        </div>
+
+        <div class="illustration-box">
+            <div class="bg-shape"></div>
+            <i class="fas fa-robot bot-icon"></i>
+            <i class="fas fa-envelope-open-text gift-icon"></i>
+            <i class="fas fa-star sparkle-icon"></i>
+        </div>
+
+        <button class="btn-submit" onclick="submitFeedback()">Submit</button>
+
+    </div>
+
+    <script>
+        function submitFeedback() {
+            var text = document.getElementById("feedbackText").value.trim();
+            
+            if(text === "") {
+                alert("Please describe your problem before submitting!");
+                return;
+            }
+
+            // Fake loading process for realism
+            var btn = document.querySelector(".btn-submit");
+            var originalText = btn.innerText;
+            btn.innerText = "Submitting...";
+            btn.disabled = true;
+
+            setTimeout(function() {
+                alert("✅ Thank you! Your feedback has been submitted successfully.\nWe will process it quickly.");
+                document.getElementById("feedbackText").value = ""; // Clear the box
+                
+                btn.innerText = originalText;
+                btn.disabled = false;
+                
+                window.history.back(); // Redirect back after submit
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

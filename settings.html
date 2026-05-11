@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Settings Center - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f8f9fc; color: #333; padding-bottom: 30px; }
+
+        /* HEADER */
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; height: 60px;}
+        .header i { position: absolute; left: 15px; font-size: 20px; cursor: pointer; padding: 5px; }
+        .header-title { font-size: 18px; font-weight: bold; }
+
+        /* TOP BACKGROUND EXTENSION */
+        .top-bg { background: #3b236d; height: 40px; width: 100%; position: absolute; z-index: 1; border-radius: 0 0 20px 20px;}
+
+        .container { padding: 0 15px; position: relative; z-index: 10; }
+
+        /* PROFILE CARD */
+        .profile-card { background: white; border-radius: 15px; padding: 0; margin-top: 10px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; overflow: hidden; border-top: 4px solid #ff7979; }
+        
+        .pc-row { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; border-bottom: 1px solid #f1f2f6; cursor: pointer; transition: 0.2s;}
+        .pc-row:active { background: #f8f9fa; }
+        .pc-row:last-child { border-bottom: none; }
+
+        .avatar-box { display: flex; align-items: center; gap: 15px; }
+        .avatar-img { width: 50px; height: 50px; border-radius: 50%; background: #dfe4ea; border: 2px solid #e0dbf8; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #a4b0be; overflow: hidden;}
+        .avatar-img img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .arrow-text { font-size: 13px; color: #747d8c; display: flex; align-items: center; gap: 8px; }
+        .arrow-text i { font-size: 14px; color: #a4b0be; }
+
+        .item-label { font-size: 14px; font-weight: bold; color: #2f3542; }
+        .item-value { font-size: 13px; color: #747d8c; display: flex; align-items: center; gap: 8px; font-weight: bold;}
+
+        /* SECURITY SECTION */
+        .sec-title { font-size: 15px; font-weight: 900; color: #3b236d; margin-bottom: 15px; display: flex; align-items: center; gap: 6px; }
+        .sec-title::before { content: ''; width: 3px; height: 15px; background: #6c5ce7; border-radius: 2px; }
+
+        .setting-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+        
+        .set-item { background: white; border-radius: 12px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); cursor: pointer; transition: 0.2s; border: 1px solid #f1f2f6;}
+        .set-item:active { transform: scale(0.98); }
+        
+        .set-left { display: flex; align-items: center; gap: 12px; }
+        .set-icon { width: 28px; height: 28px; border-radius: 8px; background: #fff0f1; color: #ff4757; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .set-text { font-size: 14px; font-weight: bold; color: #2f3542; }
+
+        /* CLEAR CACHE BUTTON */
+        .btn-clear { width: 100%; background: linear-gradient(135deg, #7b4397, #6c5ce7); color: white; border: none; padding: 16px; border-radius: 30px; font-size: 16px; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4); transition: 0.2s; }
+        .btn-clear:active { transform: scale(0.96); box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3); }
+
+        /* MODAL FOR NICKNAME */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+        .modal-box { background: white; width: 85%; border-radius: 15px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: popIn 0.3s ease; }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .m-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #3b236d; text-align: center; }
+        .m-input { width: 100%; padding: 12px 15px; border: 1px solid #dfe4ea; border-radius: 8px; font-size: 14px; font-weight: bold; outline: none; margin-bottom: 20px; text-align: center;}
+        .m-input:focus { border-color: #6c5ce7; }
+        .m-btn-row { display: flex; gap: 10px; }
+        .m-btn { flex: 1; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; }
+        .m-btn-cancel { background: #f1f2f6; color: #747d8c; }
+        .m-btn-confirm { background: #6c5ce7; color: white; }
+
+        /* LOADER FOR CACHE */
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid white; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="window.history.back()"></i>
+        <div class="header-title">Settings Center</div>
+    </div>
+    
+    <div class="top-bg"></div>
+
+    <div class="container">
+        
+        <div class="profile-card">
+            <div class="pc-row" onclick="alert('Avatar selection feature coming soon!')">
+                <div class="avatar-box">
+                    <div class="avatar-img">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <div class="arrow-text">Change avatar <i class="fas fa-chevron-right"></i></div>
+            </div>
+
+            <div class="pc-row" onclick="openNickModal()">
+                <div class="item-label">Nickname</div>
+                <div class="item-value"><span id="nickDisplay">MemberNNGNCSVB</span> <i class="fas fa-chevron-right"></i></div>
+            </div>
+        </div>
+
+        <div class="sec-title">Security Information</div>
+
+        <div class="setting-list">
+            <div class="set-item" onclick="alert('Change Password page coming soon!')">
+                <div class="set-left">
+                    <div class="set-icon"><i class="fas fa-lock"></i></div>
+                    <div class="set-text">Login password</div>
+                </div>
+                <div class="arrow-text">Edit <i class="fas fa-chevron-right"></i></div>
+            </div>
+
+            <div class="set-item" onclick="alert('You are already on the latest version!')">
+                <div class="set-left">
+                    <div class="set-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <div class="set-text">New version update</div>
+                </div>
+                <div class="arrow-text">1.0.9 <i class="fas fa-chevron-right"></i></div>
+            </div>
+        </div>
+
+        <button class="btn-clear" id="cacheBtn" onclick="clearCache()">
+            <i class="fas fa-broom" id="cacheIcon"></i>
+            <div class="loader" id="cacheLoader"></div>
+            <span id="cacheText">clearCache</span>
+        </button>
+
+    </div>
+
+    <div class="modal-overlay" id="nickModal">
+        <div class="modal-box">
+            <div class="m-title">Change Nickname</div>
+            <input type="text" id="nickInput" class="m-input" placeholder="Enter new nickname" maxlength="15">
+            <div class="m-btn-row">
+                <button class="m-btn m-btn-cancel" onclick="closeNickModal()">Cancel</button>
+                <button class="m-btn m-btn-confirm" onclick="saveNickname()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- NICKNAME LOGIC ---
+        // 1. Load saved nickname or generate default
+        var savedNick = localStorage.getItem("r_nickname");
+        if(!savedNick) {
+            // Generate random default like Member98273
+            savedNick = "Member" + Math.floor(Math.random() * 90000 + 10000);
+            localStorage.setItem("r_nickname", savedNick);
+        }
+        document.getElementById("nickDisplay").innerText = savedNick;
+
+        function openNickModal() {
+            document.getElementById("nickInput").value = savedNick;
+            document.getElementById("nickModal").style.display = "flex";
+        }
+
+        function closeNickModal() {
+            document.getElementById("nickModal").style.display = "none";
+        }
+
+        function saveNickname() {
+            var newNick = document.getElementById("nickInput").value.trim();
+            if(newNick === "") {
+                alert("Nickname cannot be empty!");
+                return;
+            }
+            
+            savedNick = newNick;
+            localStorage.setItem("r_nickname", savedNick);
+            document.getElementById("nickDisplay").innerText = savedNick;
+            
+            closeNickModal();
+            alert("Nickname updated successfully!");
+        }
+
+        // --- CLEAR CACHE LOGIC ---
+        function clearCache() {
+            var btnText = document.getElementById("cacheText");
+            var icon = document.getElementById("cacheIcon");
+            var loader = document.getElementById("cacheLoader");
+            var btn = document.getElementById("cacheBtn");
+
+            // Prevent double click
+            if(btn.disabled) return;
+
+            // Start Animation
+            btn.disabled = true;
+            icon.style.display = "none";
+            loader.style.display = "block";
+            btnText.innerText = "Clearing...";
+
+            // Simulate cleaning process for 1.5 seconds
+            setTimeout(function() {
+                // We won't wipe localStorage so user balance doesn't reset during testing.
+                // Just giving the real feel of clearing temporary cache.
+                
+                icon.style.display = "block";
+                loader.style.display = "none";
+                btnText.innerText = "clearCache";
+                btn.disabled = false;
+                
+                alert("✅ Cache cleared successfully! App runs smoothly now.");
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

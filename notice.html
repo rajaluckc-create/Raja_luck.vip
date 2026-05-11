@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Notice & Messages - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f5f5f9; color: #333; padding-bottom: 30px; }
+
+        /* HEADER */
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header i { position: absolute; left: 15px; font-size: 20px; cursor: pointer; padding: 5px; }
+        .header-title { font-size: 18px; font-weight: bold; }
+
+        /* TABS */
+        .tabs-wrapper { background: white; padding: 0; display: flex; box-shadow: 0 2px 5px rgba(0,0,0,0.02); margin-bottom: 15px; }
+        .tab-item { flex: 1; text-align: center; padding: 15px 0; font-size: 14px; font-weight: bold; color: #a4b0be; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .tab-item.active { color: #6c5ce7; border-bottom-color: #6c5ce7; }
+
+        /* MESSAGES CONTAINER */
+        .msg-container { padding: 0 15px; }
+
+        /* MESSAGE CARD */
+        .msg-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); position: relative; display: flex; gap: 15px; align-items: flex-start; }
+        
+        .msg-icon-box { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; position: relative;}
+        
+        /* Icon Colors */
+        .type-admin .msg-icon-box { background: rgba(255, 71, 87, 0.1); color: #ff4757; }
+        .type-system .msg-icon-box { background: rgba(108, 92, 231, 0.1); color: #6c5ce7; }
+        
+        /* Unread Dot */
+        .unread-dot { position: absolute; top: 0; right: 0; width: 10px; height: 10px; background: #ff4757; border-radius: 50%; border: 2px solid white; }
+
+        .msg-content { flex: 1; }
+        .msg-title { font-size: 14px; font-weight: bold; color: #2f3542; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;}
+        .msg-time { font-size: 10px; color: #a4b0be; font-weight: normal; }
+        .msg-desc { font-size: 12px; color: #747d8c; line-height: 1.5; }
+
+        /* ACTION BUTTON IN MSG (Optional) */
+        .msg-btn { display: inline-block; margin-top: 10px; background: #f1f2f6; color: #6c5ce7; font-size: 11px; font-weight: bold; padding: 5px 12px; border-radius: 5px; text-decoration: none; }
+
+        .empty-state { text-align: center; padding: 50px 20px; color: #a4b0be; display: none; }
+        .empty-state i { font-size: 50px; margin-bottom: 15px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="window.history.back()"></i>
+        <div class="header-title">Notification</div>
+    </div>
+
+    <div class="tabs-wrapper">
+        <div class="tab-item active" onclick="switchTab('all', this)">All Messages</div>
+        <div class="tab-item" onclick="switchTab('system', this)">System</div>
+    </div>
+
+    <div class="msg-container" id="messageList">
+        </div>
+
+    <div class="empty-state" id="emptyState">
+        <i class="fas fa-envelope-open"></i>
+        <div style="font-size: 14px; font-weight: bold;">No new messages</div>
+    </div>
+
+    <script>
+        function loadMessages() {
+            var container = document.getElementById("messageList");
+            var html = "";
+
+            // 1. Fetch LIVE Admin Notice from localStorage
+            var adminNotice = localStorage.getItem("admin_notice") || "Exceptional benefits to our new customers and daily rewards await you!";
+            
+            // Format current date for Admin message
+            var today = new Date();
+            var dateStr = today.getFullYear() + "-" + String(today.getMonth()+1).padStart(2,'0') + "-" + String(today.getDate()).padStart(2,'0');
+
+            // --- ADMIN MESSAGE CARD ---
+            html += `
+                <div class="msg-card type-admin msg-item" data-type="admin">
+                    <div class="msg-icon-box">
+                        <i class="fas fa-bullhorn"></i>
+                        <div class="unread-dot"></div>
+                    </div>
+                    <div class="msg-content">
+                        <div class="msg-title">Admin Announcement <span class="msg-time">${dateStr}</span></div>
+                        <div class="msg-desc">${adminNotice}</div>
+                    </div>
+                </div>
+            `;
+
+            // --- SYSTEM MESSAGE: LOGIN SUCCESS ---
+            html += `
+                <div class="msg-card type-system msg-item" data-type="system">
+                    <div class="msg-icon-box">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="msg-content">
+                        <div class="msg-title">Login Successful <span class="msg-time">Just now</span></div>
+                        <div class="msg-desc">Your account was logged in successfully. If this wasn't you, please change your password immediately.</div>
+                    </div>
+                </div>
+            `;
+
+            // --- SYSTEM MESSAGE: WELCOME ---
+            html += `
+                <div class="msg-card type-system msg-item" data-type="system">
+                    <div class="msg-icon-box">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="msg-content">
+                        <div class="msg-title">Welcome to Raja Luck VIP <span class="msg-time">System</span></div>
+                        <div class="msg-desc">Welcome to the best gaming platform. Complete your first deposit to claim your new user bonus and start winning today!</div>
+                        <a href="deposit.html" class="msg-btn">Deposit Now</a>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Tab Switching Logic
+        window.switchTab = function(type, element) {
+            // Update Tab UI
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            // Filter Messages
+            var items = document.querySelectorAll('.msg-item');
+            var visibleCount = 0;
+
+            items.forEach(item => {
+                if (type === 'all' || item.getAttribute('data-type') === type) {
+                    item.style.display = "flex";
+                    visibleCount++;
+                } else {
+                    item.style.display = "none";
+                }
+            });
+
+            // Show Empty State if no messages
+            if(visibleCount === 0) {
+                document.getElementById('emptyState').style.display = "block";
+            } else {
+                document.getElementById('emptyState').style.display = "none";
+            }
+        };
+
+        // Initialize
+        loadMessages();
+    </script>
+</body>
+</html>

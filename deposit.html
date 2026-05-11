@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deposit - Raja Luck VIP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f7f8fc; color: #333; padding-bottom: 80px; overflow-x: hidden; }
+
+        /* HEADER */
+        .header { background: linear-gradient(135deg, #6c5ce7, #a29bfe); padding: 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; color: white; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.2); }
+        .header i { font-size: 20px; cursor: pointer; padding: 5px; }
+        .header-title { font-size: 18px; font-weight: 900; letter-spacing: 0.5px; }
+        .header-link { font-size: 12px; font-weight: bold; color: #fff; text-decoration: none; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px; }
+
+        .container { padding: 15px; }
+
+        /* VIP BALANCE CARD */
+        .balance-card { background: linear-gradient(135deg, #141124, #2d3436); border-radius: 18px; padding: 25px 20px; color: #f1c40f; position: relative; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; border: 1px solid #333;}
+        .balance-card::before { content: ''; position: absolute; right: -20px; top: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+        .bal-label { font-size: 11px; text-transform: uppercase; color: #a4b0be; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px; display: flex; align-items: center; gap: 5px;}
+        .bal-amount { font-size: 36px; font-weight: 900; color: #f6c745; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .refresh-btn { position: absolute; right: 20px; top: 25px; color: #a4b0be; font-size: 16px; cursor: pointer; background: rgba(255,255,255,0.1); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        /* SECTION TITLES */
+        .sec-title { font-size: 14px; font-weight: 900; color: #2f3542; margin-bottom: 15px; display: flex; align-items: center; gap: 6px; }
+        .sec-title::before { content: ''; width: 4px; height: 14px; background: #6c5ce7; border-radius: 2px; }
+
+        /* PAYMENT METHOD */
+        .payment-box { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 20px; border: 2px solid #6c5ce7; position: relative; overflow: hidden; }
+        .payment-box::after { content: '\f058'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 10px; right: 10px; color: #6c5ce7; font-size: 18px; }
+        .pay-icon { width: 45px; height: 45px; background: #f0edff; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; color: #6c5ce7; font-size: 24px; }
+        .pay-name { font-size: 14px; font-weight: bold; color: #2f3542; }
+        .pay-limit { font-size: 10px; color: #a4b0be; margin-top: 4px; font-weight: bold; }
+
+        /* AMOUNT GRID */
+        .amount-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 20px; }
+        .grid-amt { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .btn-amt { background: #f8f9fa; border: 2px solid #f1f2f6; border-radius: 10px; padding: 15px 5px; font-size: 15px; font-weight: 900; color: #747d8c; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn-amt span { font-size: 12px; font-weight: bold; margin-right: 2px; opacity: 0.7;}
+        .btn-amt.active { background: #f0edff; border-color: #6c5ce7; color: #6c5ce7; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(108, 92, 231, 0.15); }
+
+        /* CUSTOM INPUT */
+        .custom-input { display: flex; align-items: center; background: #f8f9fa; border: 2px solid #dfe4ea; border-radius: 12px; padding: 10px 15px; transition: 0.2s; }
+        .custom-input:focus-within { border-color: #6c5ce7; background: #fff; box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1); }
+        .custom-input span { font-size: 20px; font-weight: 900; color: #6c5ce7; margin-right: 10px; }
+        .custom-input input { flex: 1; border: none; background: transparent; font-size: 18px; font-weight: 900; color: #2f3542; outline: none; }
+        .custom-input input::placeholder { color: #b2bec3; font-weight: 500; font-size: 15px; }
+
+        /* BIG SUBMIT BUTTON */
+        .btn-submit { width: 100%; background: linear-gradient(135deg, #ff6b81, #ff4757); color: white; border: none; padding: 18px; border-radius: 30px; font-size: 16px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 15px rgba(255, 71, 87, 0.3); transition: 0.2s; margin-top: 10px; }
+        .btn-submit:active { transform: scale(0.97); }
+
+        /* INSTRUCTIONS */
+        .instruction-box { background: #fff0f1; border-radius: 12px; padding: 15px; margin-top: 20px; border: 1px dashed #ffcad1; }
+        .inst-title { font-size: 12px; font-weight: bold; color: #ff4757; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .inst-list { font-size: 11px; color: #747d8c; line-height: 1.6; padding-left: 15px; font-weight: 500; }
+        .inst-list li { margin-bottom: 5px; }
+
+        /* ======================================= */
+        /* SCREEN 2: UTR SUBMISSION PANEL */
+        /* ======================================= */
+        #utrScreen { display: none; }
+        
+        .qr-card { background: white; border-radius: 15px; padding: 30px 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .qr-title { font-size: 15px; font-weight: 900; color: #2f3542; margin-bottom: 10px; }
+        .qr-sub { font-size: 11px; color: #ff4757; font-weight: bold; margin-bottom: 20px; }
+        .qr-image-box { width: 200px; height: 200px; background: white; border: 2px solid #dfe4ea; border-radius: 15px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; padding: 10px; }
+        .qr-image-box img { width: 100%; height: 100%; border-radius: 10px; }
+        
+        .upi-copy-box { background: #f0edff; border: 1px dashed #6c5ce7; border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .upi-text { font-size: 14px; font-weight: bold; color: #6c5ce7; }
+        .btn-copy { background: #6c5ce7; color: white; border: none; padding: 5px 12px; border-radius: 5px; font-size: 11px; font-weight: bold; cursor: pointer; }
+
+        .utr-form { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .utr-label { font-size: 13px; font-weight: bold; color: #2f3542; margin-bottom: 10px; display: block; }
+        .btn-submit-utr { width: 100%; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); margin-top: 15px; }
+
+        /* BOTTOM NAV */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; align-items: center; height: 65px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; border-radius: 20px 20px 0 0;}
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: bold; color: #a4b0be; text-decoration: none; gap: 4px; cursor: pointer; }
+        .nav-item.active { color: #ff4757; }
+        .nav-item i { font-size: 20px; }
+        .nav-center { position: relative; }
+        .nav-center .circle { width: 60px; height: 60px; background: linear-gradient(135deg, #ff6b81, #ff4757); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -35px; left: -30px; border: 5px solid #f7f8fc; box-shadow: 0 4px 10px rgba(255,71,87,0.3); color: white; font-size: 28px; }
+        .nav-center span { margin-top: 28px; display: block; margin-left: -10px;}
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="window.location.href='my.html'" id="backBtn"></i>
+        <div class="header-title">Deposit</div>
+        <a href="deposit_history.html" class="header-link">Records</a>
+    </div>
+
+    <div class="container" id="screenAmount">
+        
+        <div class="balance-card">
+            <div class="bal-label"><i class="fas fa-wallet" style="color:#f6c745;"></i> Available Balance</div>
+            <div class="bal-amount">₹ <span id="currentBal">0.00</span></div>
+            <div class="refresh-btn" onclick="alert('Balance Refreshed!')"><i class="fas fa-sync-alt"></i></div>
+        </div>
+
+        <div class="sec-title">Select Channel</div>
+        <div class="payment-box">
+            <div class="pay-icon"><i class="fas fa-qrcode"></i></div>
+            <div class="pay-name">UPI-APP VIP</div>
+            <div class="pay-limit">Limit: ₹100 - ₹50,000</div>
+        </div>
+
+        <div class="amount-card">
+            <div class="sec-title">Deposit Amount</div>
+            
+            <div class="grid-amt">
+                <div class="btn-amt" data-val="100"><span>₹</span>100</div>
+                <div class="btn-amt active" data-val="500"><span>₹</span>500</div>
+                <div class="btn-amt" data-val="1000"><span>₹</span>1K</div>
+                <div class="btn-amt" data-val="3000"><span>₹</span>3K</div>
+                <div class="btn-amt" data-val="5000"><span>₹</span>5K</div>
+                <div class="btn-amt" data-val="10000"><span>₹</span>10K</div>
+            </div>
+
+            <div class="custom-input">
+                <span>₹</span>
+                <input type="number" id="inpAmount" placeholder="Enter custom amount" value="500" min="100">
+            </div>
+
+            <button class="btn-submit" id="btnNextScreen">Deposit Now</button>
+        </div>
+
+        <div class="instruction-box">
+            <div class="inst-title"><i class="fas fa-exclamation-circle"></i> Important Instructions</div>
+            <ul class="inst-list">
+                <li>Minimum deposit amount is ₹100.</li>
+                <li>Please transfer the exact amount you enter here.</li>
+                <li>Do not save the UPI ID or QR code for future payments, it changes frequently.</li>
+                <li>If money is deducted but not added, please contact customer service with UTR.</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="container" id="utrScreen">
+        
+        <div class="qr-card">
+            <div class="qr-title">Scan QR or Copy UPI ID</div>
+            <div class="qr-sub">Pay exactly <span id="payAmountTxt" style="font-size:16px;">₹500</span></div>
+            
+            <div class="qr-image-box">
+                <img id="qrImage" src="" alt="Payment QR">
+            </div>
+
+            <div class="upi-copy-box">
+                <span class="upi-text" id="displayUpiId">Loading...</span>
+                <button class="btn-copy" onclick="copyUpi()">COPY</button>
+            </div>
+        </div>
+
+        <div class="utr-form">
+            <label class="utr-label">Step 2: Submit 12-Digit UTR Number</label>
+            <div class="custom-input">
+                <i class="fas fa-keyboard" style="color:#a4b0be; margin-right:10px;"></i>
+                <input type="number" id="inpUtr" placeholder="Example: 3125xxxxxxxx" maxlength="12">
+            </div>
+            <button class="btn-submit-utr" id="btnSubmitFinal">Submit UTR</button>
+        </div>
+
+        <div class="instruction-box" style="background: white; border-color: #dfe4ea;">
+            <div class="inst-title" style="color: #6c5ce7;"><i class="fas fa-info-circle"></i> Where to find UTR?</div>
+            <ul class="inst-list" style="color:#747d8c;">
+                <li><b>PhonePe:</b> Check "UTR" in history details.</li>
+                <li><b>Paytm:</b> Check "UPI Ref No" in passbook.</li>
+                <li><b>Google Pay:</b> Check "UPI Transaction ID".</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="window.location.href='index.html'">
+            <i class="fas fa-home"></i><span>Home</span>
+        </div>
+        <div class="nav-item" onclick="window.location.href='activity.html'">
+            <i class="fas fa-gift"></i><span>Activity</span>
+        </div>
+        <div class="nav-item nav-center" onclick="window.location.href='get_money.html'">
+            <div class="circle"><i class="fas fa-coins"></i></div>
+            <span>Get Money</span>
+        </div>
+        <div class="nav-item" onclick="window.location.href='promote.html'">
+            <i class="fas fa-gem"></i><span>Promote</span>
+        </div>
+        <div class="nav-item active" onclick="window.location.href='my.html'">
+            <i class="fas fa-user"></i><span>My</span>
+        </div>
+    </div>
+
+
+    <script>
+        // 🚨 1. FIREBASE SETUP 🚨
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        var fireDB = firebase.firestore();
+
+        // UPI ID Logic
+        var defaultUpi = "jeetendra888@axl";
+        var activeUpi = localStorage.getItem("admin_upi") || defaultUpi;
+        document.getElementById("displayUpiId").innerText = activeUpi;
+        document.getElementById("qrImage").src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=" + activeUpi + "&pn=RajaLuck";
+
+        function copyUpi() {
+            navigator.clipboard.writeText(activeUpi);
+            alert("UPI ID Copied: " + activeUpi);
+        }
+
+        // Setup Variables
+        const screenAmount = document.getElementById('screenAmount');
+        const utrScreen = document.getElementById('utrScreen');
+        const btnNextScreen = document.getElementById('btnNextScreen');
+        const btnSubmitFinal = document.getElementById('btnSubmitFinal');
+        const backBtn = document.getElementById('backBtn');
+        const amountBtns = document.querySelectorAll('.btn-amt');
+        const inpAmount = document.getElementById('inpAmount');
+        const payAmountTxt = document.getElementById('payAmountTxt');
+        const inpUtr = document.getElementById('inpUtr');
+
+        // Load Balance
+        var bal = 0.00;
+        try { if(localStorage.getItem('r_bal')) bal = Number(localStorage.getItem('r_bal')); } catch(e) {}
+        document.getElementById("currentBal").innerText = bal.toFixed(2);
+
+        amountBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                amountBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                inpAmount.value = btn.getAttribute('data-val');
+            });
+        });
+
+        inpAmount.addEventListener('input', () => {
+            let val = inpAmount.value;
+            amountBtns.forEach(b => b.classList.remove('active'));
+            amountBtns.forEach(btn => {
+                if(btn.getAttribute('data-val') === val) {
+                    btn.classList.add('active');
+                }
+            });
+        });
+
+        // Next Screen Logic
+        btnNextScreen.addEventListener('click', () => {
+            let amt = parseInt(inpAmount.value);
+            if(!amt || amt < 100) {
+                alert("Minimum deposit amount is ₹100");
+                return;
+            }
+            payAmountTxt.innerText = "₹" + amt;
+            screenAmount.style.display = 'none';
+            utrScreen.style.display = 'block';
+            
+            backBtn.onclick = function() {
+                utrScreen.style.display = 'none';
+                screenAmount.style.display = 'block';
+                backBtn.onclick = function() { window.location.href='my.html'; };
+            };
+            window.scrollTo(0, 0);
+        });
+
+        // 🚨 2. SUBMIT FINAL LOGIC (SEND TO FIREBASE) 🚨
+        btnSubmitFinal.addEventListener('click', () => {
+            let utrVal = inpUtr.value;
+            let amtVal = inpAmount.value;
+            let userUid = localStorage.getItem("r_uid") || "Unknown";
+
+            if(utrVal.length !== 12) {
+                alert("Please enter a valid 12-digit UTR Number!");
+                return;
+            }
+
+            btnSubmitFinal.innerText = "Submitting...";
+            btnSubmitFinal.disabled = true;
+
+            // Send Deposit Request to Firebase Database -> 'deposits' collection
+            fireDB.collection("deposits").add({
+                uid: parseInt(userUid) || userUid,
+                amt: Number(amtVal),
+                utr: utrVal,
+                status: "Pending",
+                time: new Date().toLocaleString(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(function() {
+                alert("✅ Deposit Request Submitted Successfully!\nAmount: ₹" + amtVal + "\nUTR: " + utrVal + "\n\nPlease wait 5-10 minutes for admin approval.");
+                window.location.href = 'my.html';
+            }).catch(function(error) {
+                alert("Error submitting request: " + error.message);
+                btnSubmitFinal.innerText = "Submit UTR";
+                btnSubmitFinal.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

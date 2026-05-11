@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Betting Rebate - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f5f5f9; color: #333; padding-bottom: 30px; }
+
+        /* HEADER */
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; height: 55px; }
+        .back-btn { position: absolute; left: 15px; font-size: 18px; cursor: pointer; color: white; }
+        .header-title { font-size: 18px; font-weight: bold; }
+
+        /* REBATE BANNER */
+        .rebate-banner { background: linear-gradient(135deg, #6c5ce7, #a29bfe); padding: 40px 20px; text-align: center; color: white; border-radius: 0 0 25px 25px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2); }
+        .rebate-label { font-size: 14px; opacity: 0.9; margin-bottom: 10px; font-weight: bold; }
+        .rebate-amount { font-size: 42px; font-weight: 900; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .rebate-amount span { font-size: 20px; margin-right: 5px; }
+
+        .container { padding: 20px 15px; }
+
+        /* STATS CARD */
+        .stats-card { background: white; border-radius: 15px; padding: 20px; display: flex; justify-content: space-between; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .stat-box { text-align: center; flex: 1; }
+        .stat-box:first-child { border-right: 1px solid #f1f2f6; }
+        .stat-val { font-size: 18px; font-weight: bold; color: #3b236d; margin-bottom: 5px; }
+        .stat-lbl { font-size: 11px; color: #a4b0be; font-weight: bold; text-transform: uppercase; }
+
+        /* CLAIM BUTTON */
+        .btn-claim { width: 100%; background: linear-gradient(90deg, #ff7b54, #ff5252); color: white; border: none; padding: 16px; border-radius: 35px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 82, 82, 0.3); transition: 0.2s; }
+        .btn-claim:active { transform: scale(0.97); }
+
+        /* INFO LIST */
+        .info-list { margin-top: 30px; }
+        .info-item { display: flex; gap: 15px; margin-bottom: 20px; }
+        .info-icon { width: 35px; height: 35px; background: #f0edff; color: #6c5ce7; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .info-txt h4 { font-size: 14px; color: #2f3542; margin-bottom: 4px; }
+        .info-txt p { font-size: 12px; color: #747d8c; line-height: 1.5; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left back-btn" onclick="window.history.back()"></i>
+        <div class="header-title">Betting Rebate</div>
+    </div>
+
+    <div class="rebate-banner">
+        <div class="rebate-label">All-time Receivable Rebate</div>
+        <div class="rebate-amount"><span>₹</span><span id="receivableAmt">0.00</span></div>
+        <button class="btn-claim" onclick="claimRebate()">One-Click To Receive</button>
+    </div>
+
+    <div class="container">
+        
+        <div class="stats-card">
+            <div class="stat-box">
+                <div class="stat-val">₹<span id="totalBet">0.00</span></div>
+                <div class="stat-lbl">Today's Bet</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-val">0.1%</div>
+                <div class="stat-lbl">Rebate Rate</div>
+            </div>
+        </div>
+
+        <div class="info-list">
+            <div class="info-item">
+                <div class="info-icon"><i class="fas fa-calculator"></i></div>
+                <div class="info-txt">
+                    <h4>Automatic Calculation</h4>
+                    <p>Rebate is calculated as (Total Bet Amount × 0.1%). It updates in real-time as you play.</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-icon"><i class="fas fa-clock"></i></div>
+                <div class="info-txt">
+                    <h4>Settlement Time</h4>
+                    <p>You can receive your betting rebate at any time. There is no waiting period.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // यह कोड आपकी 0.1% वाली कैलकुलेशन को लाइव दिखाएगा (डेमो के लिए)
+        window.onload = function() {
+            // मान लेते हैं यूज़र ने 1000 की बैट लगाई है
+            let betAmount = 1000; 
+            let rebateRate = 0.001; // 0.1%
+            
+            let rebateResult = (betAmount * rebateRate).toFixed(2);
+            
+            document.getElementById('totalBet').innerText = betAmount.toFixed(2);
+            document.getElementById('receivableAmt').innerText = rebateResult;
+        };
+
+        function claimRebate() {
+            let amt = document.getElementById('receivableAmt').innerText;
+            if(amt === "0.00") {
+                alert("No rebate available to claim!");
+            } else {
+                alert("✅ Success! ₹" + amt + " has been added to your balance.");
+                document.getElementById('receivableAmt').innerText = "0.00";
+                document.getElementById('totalBet').innerText = "0.00";
+            }
+        }
+    </script>
+</body>
+</html>

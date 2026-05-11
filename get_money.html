@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Get Money - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { background: linear-gradient(180deg, #5c0a0d 0%, #3a0406 100%); color: white; padding-bottom: 90px; min-height: 100vh; overflow-x: hidden; }
+
+        /* HEADER & MARQUEE */
+        .header { display: flex; align-items: center; justify-content: space-between; padding: 15px; }
+        .head-btn { width: 35px; height: 35px; background: rgba(255,255,255,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; color: white;}
+        .winner-marquee { flex: 1; background: rgba(0,0,0,0.3); margin: 0 10px; border-radius: 20px; padding: 6px 15px; display: flex; align-items: center; font-size: 12px; font-weight: bold; overflow: hidden;}
+        .winner-marquee span { color: #f1c40f; margin: 0 5px; }
+
+        /* BALANCE AREA */
+        .balance-area { background: #4a0609; margin: 10px 20px; border-radius: 20px; padding: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.3); position: relative; z-index: 10;}
+        .bal-amt { font-size: 42px; font-weight: 900; color: #ffeaa7; text-shadow: 0 2px 10px rgba(255, 234, 167, 0.3); margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 5px;}
+        .bal-amt i { font-size: 24px; color: #f1c40f; }
+        .btn-claim { background: linear-gradient(180deg, #ffeaa7, #f1c40f); color: #5c0a0d; border: none; width: 100%; padding: 15px; border-radius: 30px; font-size: 18px; font-weight: 900; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4); cursor: pointer; transition: 0.2s;}
+        .btn-claim:active { transform: scale(0.97); }
+
+        /* ADVANCED WHEEL DESIGN */
+        .wheel-container { position: relative; margin: 30px auto; width: 320px; height: 320px; display: flex; align-items: center; justify-content: center; }
+        
+        .wheel-outer { width: 300px; height: 300px; border-radius: 50%; background: #3a0406; border: 14px solid #a83232; box-shadow: 0 0 25px rgba(0,0,0,0.6), inset 0 0 20px rgba(0,0,0,0.5); position: relative; overflow: hidden; transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99); }
+        
+        /* Conic gradient for 6 slices */
+        .wheel-bg { position: absolute; width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(#8c181c 0deg 60deg, #5c0a0d 60deg 120deg, #8c181c 120deg 180deg, #5c0a0d 180deg 240deg, #8c181c 240deg 300deg, #5c0a0d 300deg 360deg); border: 4px solid #f1c40f; }
+        
+        /* Placing Values on the Wheel */
+        .slice { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; transform-origin: 0% 100%; display: flex; align-items: flex-start; justify-content: center; padding-top: 15px; font-size: 18px; font-weight: 900; color: #ffeaa7; text-shadow: 1px 1px 2px black; }
+        .slice.s1 { transform: rotate(30deg); }
+        .slice.s2 { transform: rotate(90deg); color: #2ed573;} /* Green icon slice */
+        .slice.s3 { transform: rotate(150deg); }
+        .slice.s4 { transform: rotate(210deg); color: #2ed573;} /* Green icon slice */
+        .slice.s5 { transform: rotate(270deg); }
+        .slice.s6 { transform: rotate(330deg); }
+
+        .slice i { font-size: 24px; margin-top: 5px; }
+
+        /* SPIN CENTER BUTTON */
+        .spin-center { position: absolute; width: 120px; height: 120px; background: radial-gradient(circle, #ffeaa7, #f1c40f); border-radius: 50%; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #5c0a0d; font-weight: 900; box-shadow: 0 5px 15px rgba(0,0,0,0.6); border: 5px solid white; cursor: pointer; top: 50%; left: 50%; transform: translate(-50%, -50%);}
+        .spin-num { font-size: 36px; line-height: 1; }
+        .spin-txt { font-size: 11px; margin-top: 2px; }
+
+        /* POINTER / TOOLTIP */
+        .pointer-arrow { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid #f1c40f; z-index: 30; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
+        
+        .tooltip { position: absolute; top: -65px; background: rgba(0,0,0,0.8); color: white; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: bold; text-align: center; border: 1px solid rgba(255,255,255,0.2); animation: bounce 1s infinite; z-index: 40; white-space: nowrap;}
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+        /* TIMER & INVITE */
+        .timer-text { text-align: center; font-size: 13px; color: #dcdde1; margin-bottom: 20px; font-weight: bold;}
+        .btn-big-invite { background: linear-gradient(180deg, #ffeaa7, #f1c40f); color: #5c0a0d; border: none; width: 90%; margin: 0 auto; display: block; padding: 18px; border-radius: 30px; font-size: 18px; font-weight: 900; box-shadow: 0 4px 15px rgba(241, 196, 15, 0.4); cursor: pointer; transition: 0.2s;}
+        
+        /* HISTORY HEADER */
+        .history-bar { background: rgba(0,0,0,0.4); margin: 20px 20px 0; padding: 15px; border-radius: 15px 15px 0 0; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: bold; color: white; }
+
+        /* BOTTOM NAV */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; align-items: center; height: 65px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; border-radius: 20px 20px 0 0;}
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #a4b0be; text-decoration: none; width: 20%; gap: 4px;}
+        .nav-center .circle { width: 60px; height: 60px; background: linear-gradient(135deg, #ff9f43, #ff4757); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); border: 4px solid #5c0a0d; box-shadow: 0 4px 10px rgba(255,71,87,0.3); color: white; font-size: 28px; }
+        .nav-center span { margin-top: 32px; display: block; color: #ff4757;}
+
+        /* OVERLAY BOXES */
+        #boxOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .overlay-title { font-size: 24px; font-weight: 900; margin-bottom: 40px; color: #f1c40f; text-align: center; line-height: 1.4;}
+        .boxes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .treasure-box { width: 110px; height: 110px; background: linear-gradient(135deg, #e74c3c, #c0392b); border: 4px solid #f1c40f; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 50px; cursor: pointer; box-shadow: 0 0 30px rgba(241,196,15,0.4); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+
+    </style>
+</head>
+<body>
+
+    <div id="boxOverlay">
+        <div class="overlay-title">Pick a lucky box to<br>get your initial bonus!</div>
+        <div class="boxes-grid">
+            <div class="treasure-box" onclick="openBox()"><i class="fas fa-gift"></i></div>
+            <div class="treasure-box" onclick="openBox()"><i class="fas fa-gift"></i></div>
+            <div class="treasure-box" onclick="openBox()"><i class="fas fa-gift"></i></div>
+            <div class="treasure-box" onclick="openBox()"><i class="fas fa-gift"></i></div>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="head-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></div>
+        <div class="winner-marquee">
+            <marquee behavior="scroll" direction="left" scrollamount="4">
+                User ****270 Won <span>₹500</span> | User ****891 Won <span>₹500</span>
+            </marquee>
+        </div>
+        <div class="head-btn"><i class="fas fa-bars"></i></div>
+    </div>
+
+    <div class="balance-area">
+        <div class="bal-amt"><i class="fas fa-coins"></i> <span id="currentBal">0.00</span></div>
+        <button class="btn-claim" onclick="tryClaim()">Claim</button>
+    </div>
+
+    <div class="wheel-container">
+        
+        <div class="tooltip">Tap here to withdraw<br>500 cash easily!</div>
+        <div class="pointer-arrow"></div>
+
+        <div class="wheel-outer" id="spinWheel">
+            <div class="wheel-bg"></div>
+            <div class="slice s1" style="transform: rotate(30deg) translateY(-20px);">₹500</div>
+            <div class="slice s2" style="transform: rotate(90deg) translateY(-20px);"><i class="fas fa-money-bill-wave"></i></div>
+            <div class="slice s3" style="transform: rotate(150deg) translateY(-20px);">₹5</div>
+            <div class="slice s4" style="transform: rotate(210deg) translateY(-20px);"><i class="fas fa-money-bill-wave"></i></div>
+            <div class="slice s5" style="transform: rotate(270deg) translateY(-20px);">₹8</div>
+            <div class="slice s6" style="transform: rotate(330deg) translateY(-20px);">₹300</div>
+        </div>
+
+        <div class="spin-center" onclick="spinAction()">
+            <div class="spin-num">0</div>
+            <div class="spin-txt">FREE SPIN</div>
+        </div>
+    </div>
+
+    <div class="timer-text">Event ends in : <span id="eventTimer">--:--:--</span></div>
+
+    <button class="btn-big-invite" onclick="window.location.href='promote.html'">Invite Friends to Earn Together</button>
+
+    <div class="history-bar">
+        <i class="fas fa-list-alt"></i> Spin History
+    </div>
+
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="activity.html" class="nav-item"><i class="fas fa-gift"></i><span>Activity</span></a>
+        <div class="nav-item nav-center active">
+            <div class="circle"><i class="fas fa-coins"></i></div>
+            <span>Get Money</span>
+        </div>
+        <a href="promote.html" class="nav-item"><i class="fas fa-gem"></i><span>Promote</span></a>
+        <a href="my.html" class="nav-item"><i class="fas fa-user"></i><span>My</span></a>
+    </div>
+
+    <script>
+        // ----------------------------------------------------
+        // 1. 3-DAY RESET & BOX OVERLAY LOGIC (Local Storage)
+        // ----------------------------------------------------
+        const RESET_DAYS = 3;
+        const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+        function checkEventStatus() {
+            let lastEventStartTime = localStorage.getItem("r_event_start_time");
+            let currentTime = new Date().getTime();
+            let isBoxClaimed = localStorage.getItem("r_box_claimed");
+
+            // अगर पहली बार आया है, या 3 दिन से ज्यादा हो गए हैं
+            if (!lastEventStartTime || (currentTime - lastEventStartTime > RESET_DAYS * MS_PER_DAY)) {
+                // रिसेट सिस्टम
+                localStorage.setItem("r_event_start_time", currentTime);
+                localStorage.setItem("r_box_claimed", "false");
+                localStorage.setItem("r_spin_balance", "0.00");
+                
+                // बॉक्स दिखाओ
+                document.getElementById('boxOverlay').style.display = 'flex';
+                document.getElementById('currentBal').innerText = "0.00";
+            } else {
+                // अगर 3 दिन के अंदर ही है
+                if (isBoxClaimed === "true") {
+                    document.getElementById('boxOverlay').style.display = 'none';
+                    let savedBal = localStorage.getItem("r_spin_balance") || "0.00";
+                    document.getElementById('currentBal').innerText = savedBal;
+                } else {
+                    document.getElementById('boxOverlay').style.display = 'flex';
+                    document.getElementById('currentBal').innerText = "0.00";
+                }
+            }
+        }
+
+        function openBox() {
+            document.getElementById('boxOverlay').style.display = 'none';
+            document.getElementById('currentBal').innerText = "478.75";
+            
+            // सेव करो कि बॉक्स खुल गया है
+            localStorage.setItem("r_box_claimed", "true");
+            localStorage.setItem("r_spin_balance", "478.75");
+
+            alert("🎉 Congratulations! You received an initial bonus of ₹478.75! Spin to reach ₹500.");
+        }
+
+        // ----------------------------------------------------
+        // 2. LIVE COUNTDOWN TIMER (3 Days)
+        // ----------------------------------------------------
+        function startTimer() {
+            setInterval(function() {
+                let startTime = parseInt(localStorage.getItem("r_event_start_time"));
+                if(!startTime) return;
+
+                let endTime = startTime + (RESET_DAYS * MS_PER_DAY);
+                let now = new Date().getTime();
+                let timeLeft = endTime - now;
+
+                if (timeLeft <= 0) {
+                    // Time up, reset will happen on reload
+                    document.getElementById("eventTimer").innerText = "00:00:00";
+                    return;
+                }
+
+                // Calculate Hours, Mins, Secs
+                let hours = Math.floor((timeLeft / (1000 * 60 * 60)));
+                let minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                // Format with leading zeros
+                hours = (hours < 10) ? "0" + hours : hours;
+                minutes = (minutes < 10) ? "0" + minutes : minutes;
+                seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+                document.getElementById("eventTimer").innerText = hours + ":" + minutes + ":" + seconds;
+            }, 1000);
+        }
+
+        // ----------------------------------------------------
+        // 3. WHEEL SPIN LOGIC
+        // ----------------------------------------------------
+        let currentRotation = 0;
+        
+        function spinAction() {
+            // चूँकि अभी 0 फ्री स्पिन हैं (कठोर कोडिंग)
+            // फिर भी मैं एक इफ़ेक्ट डाल रहा हूँ ताकि व्हील थोड़ा हिले
+            let wheel = document.getElementById("spinWheel");
+            currentRotation += 3600; // 10 full spins
+            wheel.style.transform = "rotate(" + currentRotation + "deg)";
+
+            setTimeout(function() {
+                alert("Oops! You have 0 Free Spins.\nPlease invite new active users to deposit. 1 Active User = 1 Spin.");
+            }, 4000); // 4 sec spin duration
+        }
+
+        function tryClaim() {
+            let bal = parseFloat(document.getElementById('currentBal').innerText);
+            if(bal < 500) {
+                alert("You need exactly ₹500 to withdraw! Invite active friends to get more spins.");
+            } else {
+                alert("✅ Withdrawal of ₹500 successful!");
+            }
+        }
+
+        // Initialize everything on load
+        window.onload = function() {
+            checkEventStatus();
+            startTimer();
+        };
+    </script>
+</body>
+</html>

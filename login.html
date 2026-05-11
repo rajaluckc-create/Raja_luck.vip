@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Log In - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* 🚨 ORIGINAL DESIGN - NO CHANGES 🚨 */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        body { background-color: #ffffff; color: #333; }
+        .top-bg { background: linear-gradient(135deg, #ff6b6b, #ff8e53); padding: 15px 20px 30px 20px; color: white; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .nav-btn, .lang-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; cursor: pointer; }
+        .nav-btn { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .lang-btn { padding: 5px 12px; border-radius: 20px; display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 500; }
+        .logo { font-size: 20px; font-weight: 900; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; }
+        .page-title { font-size: 32px; font-weight: 500; margin-bottom: 5px; text-transform: capitalize; }
+        .subtitle { font-size: 14px; color: white; text-decoration: none; opacity: 0.9; display: inline-block; padding-bottom: 10px; }
+        .form-container { padding: 25px 20px; background: #ffffff; border-radius: 20px 20px 0 0; margin-top: -15px; min-height: 70vh; }
+        .input-group { margin-bottom: 25px; }
+        .label-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 16px; font-weight: 700; color: #333; }
+        .icon-box { background: #ffe5e5; color: #ff6b6b; width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .phone-input-wrapper { display: flex; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fafafa; }
+        .country-code { background: #fafafa; border: none; padding: 15px 10px; font-size: 16px; font-weight: 600; color: #333; outline: none; border-right: 1px solid #e0e0e0; }
+        .input-field { flex: 1; border: none; padding: 15px; font-size: 15px; background: transparent; outline: none; color: #333; }
+        .standard-input-wrapper { display: flex; align-items: center; border: 1px solid #e0e0e0; border-radius: 12px; background: #fafafa; padding: 0 15px; }
+        .standard-input-wrapper input { flex: 1; border: none; padding: 15px 0; font-size: 15px; background: transparent; outline: none; color: #333; }
+        .eye-icon { color: #b2bec3; font-size: 18px; cursor: pointer; padding: 10px; }
+        .btn-primary { width: 100%; background: linear-gradient(90deg, #ff5e62, #ff9966); color: white; border: none; padding: 15px; border-radius: 30px; font-size: 18px; font-weight: 700; box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4); cursor: pointer; margin-bottom: 15px; transition: 0.2s; margin-top: 10px; text-transform: capitalize; }
+        .btn-secondary { width: 100%; background: white; color: #ff6b6b; border: 1px solid #ff6b6b; padding: 15px; border-radius: 30px; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.2s; text-transform: capitalize; }
+        ::placeholder { color: #a4b0be; }
+        #toastBox { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 12px 25px; border-radius: 30px; font-weight: 600; font-size: 14px; z-index: 9999; transition: 0.4s; display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+        #toastBox.show { bottom: 30px; }
+    </style>
+</head>
+<body>
+    <div id="toastBox"><i class="fas fa-info-circle"></i> <span id="toastMsg">Message</span></div>
+
+    <div class="top-bg">
+        <div class="navbar">
+            <button class="nav-btn" onclick="history.back()"><i class="fas fa-chevron-left"></i></button>
+            <div class="logo">👑 RAJALUCK</div>
+            <button class="lang-btn"><i class="fas fa-globe"></i> EN</button>
+        </div>
+        <div class="page-title">Log in</div>
+        <a href="register.html" class="subtitle">register account</a>
+    </div>
+
+    <div class="form-container">
+        <div class="input-group">
+            <div class="label-row"><div class="icon-box"><i class="fas fa-mobile-alt"></i></div> log in via phone number</div>
+            <div class="phone-input-wrapper">
+                <select class="country-code"><option value="+91">+91</option></select>
+                <input type="tel" id="phone" class="input-field" placeholder="Please enter a phone number" maxlength="10">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <div class="label-row"><div class="icon-box"><i class="fas fa-lock"></i></div> password</div>
+            <div class="standard-input-wrapper">
+                <input type="password" id="pass" placeholder="please enter password">
+                <i class="far fa-eye eye-icon" onclick="togglePassword('pass', this)"></i>
+            </div>
+        </div>
+
+        <button class="btn-primary" id="loginBtn" onclick="handleLogin()">log in</button>
+        <button class="btn-secondary" onclick="location.href='register.html'">register</button>
+    </div>
+
+    <script>
+        // 🚨 FIREBASE CONFIGURATION 🚨
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        
+        var auth = firebase.auth();
+        var db = firebase.firestore();
+
+        function showToast(msg) {
+            var toast = document.getElementById("toastBox");
+            document.getElementById("toastMsg").innerText = msg;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+
+        function togglePassword(inputId, iconElement) {
+            var input = document.getElementById(inputId);
+            input.type = input.type === "password" ? "text" : "password";
+            iconElement.classList.toggle("fa-eye-slash");
+            iconElement.style.color = input.type === "text" ? "#ff6b6b" : "#b2bec3";
+        }
+
+        function handleLogin() {
+            var phone = document.getElementById("phone").value.trim();
+            var p1 = document.getElementById("pass").value;
+            var btn = document.getElementById("loginBtn");
+
+            if (phone.length < 10) return showToast("Enter a valid phone number!");
+            if (p1.length < 1) return showToast("Please enter your password!");
+
+            btn.innerText = "Connecting...";
+            btn.disabled = true;
+
+            var fakeEmail = phone + "@rajaluck.com";
+
+            auth.signInWithEmailAndPassword(fakeEmail, p1)
+                .then(function(userCredential) {
+                    var user = userCredential.user;
+                    // FETCH REAL DATA FROM CLOUD
+                    return db.collection("users").doc(user.uid).get();
+                })
+                .then(function(doc) {
+                    if (doc.exists) {
+                        var userData = doc.data();
+                        
+                        localStorage.clear(); // Purge old data
+                        
+                        // 🚨 SAVING ALL REQUIRED DATA LOCALLY SO NO PAGE CRASHES 🚨
+                        localStorage.setItem("r_uid", userData.uid); 
+                        localStorage.setItem("r_phone", phone);
+                        localStorage.setItem("r_bal", userData.balance || 0); 
+                        
+                        // Wagering (3X) Data Sync
+                        localStorage.setItem("r_wager_target", userData.wagerTarget || 0);
+                        localStorage.setItem("r_wagered", userData.wagerDone || 0);
+
+                        // Invite Code & Account Sync
+                        if(userData.inviteCode) localStorage.setItem("r_my_invite_code", userData.inviteCode);
+                        if(userData.bankDetails) localStorage.setItem('r_saved_account', JSON.stringify(userData.bankDetails));
+                        
+                        showToast("Welcome Back! 👑");
+                        setTimeout(function() {
+                            window.location.href = "index.html"; 
+                        }, 1000);
+                    } else {
+                        showToast("Database error: Data not found!");
+                        btn.innerText = "log in";
+                        btn.disabled = false;
+                    }
+                })
+                .catch(function(error) {
+                    btn.innerText = "log in";
+                    btn.disabled = false;
+                    if(error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                        showToast("Incorrect Mobile Number or Password!");
+                    } else {
+                        showToast("Login Error. Try again.");
+                    }
+                });
+        }
+    </script>
+</body>
+</html>

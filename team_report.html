@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Team Report - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f5f5f9; color: #333; padding-bottom: 30px; }
+
+        /* HEADER */
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; height: 60px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+        .back-btn { position: absolute; left: 15px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .header-title { font-size: 18px; font-weight: bold; }
+
+        .container { padding: 15px; }
+
+        /* SEARCH BAR */
+        .search-box { display: flex; background: white; border-radius: 30px; padding: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 15px; align-items: center;}
+        .search-input { flex: 1; border: none; padding: 10px 15px; font-size: 14px; outline: none; background: transparent;}
+        .search-input::placeholder { color: #a4b0be; }
+        .search-btn { background: linear-gradient(135deg, #ff7f50, #ff4757); color: white; border: none; width: 40px; height: 35px; border-radius: 20px; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3); margin-right: 5px;}
+
+        /* FILTERS ROW */
+        .filter-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .filter-item { flex: 1; background: white; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f1f2f6; position: relative;}
+        .filter-icon { color: #6c5ce7; font-size: 16px; }
+        .filter-text { flex: 1; display: flex; flex-direction: column; }
+        .filter-label { font-size: 10px; color: #a4b0be; margin-bottom: 2px; }
+        
+        .filter-select, .filter-date { border: none; background: transparent; font-size: 14px; font-weight: bold; color: #2f3542; outline: none; width: 100%; -webkit-appearance: none; cursor: pointer;}
+        .filter-item::after { content: '\f107'; font-family: 'Font Awesome 5 Free'; font-weight: 900; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #a4b0be; font-size: 12px; pointer-events: none;}
+
+        /* STATS CARD */
+        .stats-card { background: #6c5ce7; border-radius: 12px; padding: 20px 10px; display: flex; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
+        .stats-col { flex: 1; display: flex; flex-direction: column; gap: 15px; text-align: center; }
+        .stats-col:first-child { border-right: 1px solid rgba(255,255,255,0.1); }
+        
+        .stat-box { display: flex; flex-direction: column; gap: 5px; }
+        .stat-val { font-size: 20px; font-weight: 900; color: #f1c40f; }
+        .stat-lbl { font-size: 11px; color: #d0c9f1; }
+
+        /* EMPTY STATE (NO DATA) */
+        .empty-state { text-align: center; padding: 40px 20px; color: #a4b0be; margin-top: 20px; }
+        .empty-state i { font-size: 60px; margin-bottom: 15px; opacity: 0.3; color: #a4b0be;}
+        .empty-state p { font-size: 14px; font-weight: bold; color: #a4b0be; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="back-btn" onclick="window.history.back()">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="header-title">team report</div>
+    </div>
+
+    <div class="container">
+        
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Search for subordinate UIDs">
+            <button class="search-btn" onclick="alert('Searching...')"><i class="fas fa-search"></i></button>
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-item">
+                <i class="fas fa-bars filter-icon"></i>
+                <div class="filter-text">
+                    <span class="filter-label">downline level</span>
+                    <select class="filter-select">
+                        <option value="All">All</option>
+                        <option value="1">Level 1</option>
+                        <option value="2">Level 2</option>
+                        <option value="3">Level 3</option>
+                        <option value="4">Level 4</option>
+                        <option value="5">Level 5</option>
+                        <option value="6">Level 6</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-item">
+                <i class="far fa-calendar-alt filter-icon"></i>
+                <div class="filter-text">
+                    <span class="filter-label">Select a date</span>
+                    <input type="date" class="filter-date" id="reportDate">
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-card">
+            <div class="stats-col">
+                <div class="stat-box">
+                    <div class="stat-val">0</div>
+                    <div class="stat-lbl">Depositors</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val">0</div>
+                    <div class="stat-lbl">Bettors</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val">0</div>
+                    <div class="stat-lbl">First Depositors</div>
+                </div>
+            </div>
+            
+            <div class="stats-col">
+                <div class="stat-box">
+                    <div class="stat-val">0</div>
+                    <div class="stat-lbl">Deposit Amount</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val">0</div>
+                    <div class="stat-lbl">Bet Amount</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val">0</div>
+                    <div class="stat-lbl">First Deposit Amount</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="teamList">
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <p>No data available</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Set Today's Date automatically in the Date Picker
+        window.onload = function() {
+            var dateInput = document.getElementById("reportDate");
+            var today = new Date();
+            var yyyy = today.getFullYear();
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var dd = String(today.getDate()).padStart(2, '0');
+            
+            dateInput.value = yyyy + '-' + mm + '-' + dd;
+        };
+    </script>
+</body>
+</html>

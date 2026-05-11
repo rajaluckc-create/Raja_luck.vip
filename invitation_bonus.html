@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Invitation Bonus - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* ORIGINAL CSS - NO CHANGES */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f5f5f9; color: #333; padding-bottom: 30px; }
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; height: 55px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+        .back-btn { position: absolute; left: 15px; font-size: 18px; cursor: pointer; color: white; }
+        .header-title { font-size: 18px; font-weight: bold; }
+        .banner { background: linear-gradient(135deg, #ff7b54, #ff5252); padding: 30px 20px; color: white; text-align: center; border-radius: 0 0 15px 15px; }
+        .banner-title { font-size: 22px; font-weight: 900; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .banner-sub { font-size: 12px; opacity: 0.9; line-height: 1.5; }
+        .container { padding: 15px; margin-top: 5px;}
+        .bonus-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #f1f2f6; }
+        .bc-title { font-size: 14px; font-weight: 900; color: #2f3542; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f1f2f6; padding-bottom: 10px; }
+        .bc-title i { color: #ff5252; font-size: 16px; }
+        .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; }
+        .info-lbl { color: #747d8c; }
+        .info-val { font-weight: bold; color: #2f3542; }
+        .info-val.highlight { color: #ff5252; font-size: 16px; font-weight: 900; }
+        .progress-box { display: flex; align-items: center; gap: 10px; margin-top: 15px; margin-bottom: 15px; }
+        .p-bar-bg { flex: 1; height: 8px; background: #f1f2f6; border-radius: 10px; overflow: hidden; position: relative; }
+        .p-bar-fill { height: 100%; background: linear-gradient(90deg, #ff7b54, #ff5252); width: 0%; border-radius: 10px; transition: width 0.4s ease; } 
+        .p-text { font-size: 12px; font-weight: bold; color: #a4b0be; min-width: 35px; text-align: right; }
+        .btn-status { width: 100%; padding: 12px; border-radius: 25px; font-size: 14px; font-weight: bold; border: none; text-align: center; }
+        .btn-unfinished { background: #f1f2f6; color: #a4b0be; cursor: not-allowed; }
+        .btn-finish { background: linear-gradient(90deg, #ff7b54, #ff5252); color: white; cursor: pointer; box-shadow: 0 4px 10px rgba(255, 82, 82, 0.3); }
+        .rules-box { background: white; border-radius: 12px; padding: 20px 15px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .rule-title { display: flex; align-items: center; font-size: 14px; font-weight: 900; color: #333; margin-bottom: 15px; gap: 8px;}
+        .red-bar { width: 4px; height: 16px; background: #ff5252; border-radius: 2px; }
+        .rule-list { list-style: none; }
+        .rule-list li { font-size: 12px; color: #747d8c; line-height: 1.6; margin-bottom: 10px; position: relative; padding-left: 15px; }
+        .rule-list li::before { content: ''; position: absolute; left: 0; top: 7px; width: 5px; height: 5px; background: #a4b0be; border-radius: 50%; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left back-btn" onclick="window.history.back()"></i>
+        <div class="header-title">Invitation bonus</div>
+    </div>
+
+    <div class="banner">
+        <div class="banner-title">Invite Friends to Recharge</div>
+        <div class="banner-sub">Invite friends to join the game, recharge and get huge bonuses! Up to 1000 valid members rewards!</div>
+    </div>
+
+    <div class="container">
+
+        <div id="cardsContainer">
+            <div style="text-align:center; padding:20px; color:#a4b0be; font-size:12px; font-weight:bold;">
+                <i class="fas fa-spinner fa-spin" style="font-size:24px; margin-bottom:10px;"></i><br>
+                Syncing with server...
+            </div>
+        </div>
+
+        <div class="rules-box">
+            <div class="rule-title"><div class="red-bar"></div> Activity Rules</div>
+            <ul class="rule-list">
+                <li>1. The invited friend needs to bind their bank card and complete a single recharge of ₹300 or more.</li>
+                <li>2. Only when the invited friend completes the recharge task will they be counted as a valid subordinate.</li>
+                <li>3. The bonus will be calculated automatically based on the number of your valid subordinates.</li>
+                <li>4. When you meet the requirements, the button will turn red, and you can click "To receive" to claim the bonus.</li>
+                <li>5. The final interpretation right of this activity belongs to the platform.</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        // 🚨 1. FIREBASE SETUP 🚨
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var fireDB = firebase.firestore();
+
+        var userUid = localStorage.getItem("r_uid");
+        var userDocId = "";
+        var validReferrals = 0; // Number of valid friends
+        var claimedBonuses = [];
+
+        // 🚨 BONUS CONFIGURATION (₹57 Base Logic Applied) 🚨
+        const bonusTiers = [
+            { count: 1, reward: 57 },
+            { count: 3, reward: 171 },
+            { count: 10, reward: 570 },
+            { count: 30, reward: 1710 },
+            { count: 100, reward: 5700 },
+            { count: 1000, reward: 57000 }
+        ];
+
+        // 🚨 2. LIVE CLOUD SYNC 🚨
+        function syncInvitationData() {
+            if(!userUid) {
+                document.getElementById("cardsContainer").innerHTML = `<div style="text-align:center; padding:20px; color:#ff5252; font-weight:bold;">Login Required</div>`;
+                return;
+            }
+
+            fireDB.collection("users").where("uid", "==", parseInt(userUid)).onSnapshot((snapshot) => {
+                if(!snapshot.empty) {
+                    var doc = snapshot.docs[0];
+                    userDocId = doc.id;
+                    var data = doc.data();
+                    
+                    validReferrals = data.validReferrals || 0; // Database should store this count
+                    claimedBonuses = data.claimedInviteBonuses || [];
+                    
+                    renderBonusCards();
+                }
+            });
+        }
+
+        // 🚨 3. DYNAMICALLY GENERATE CARDS 🚨
+        function renderBonusCards() {
+            let html = "";
+
+            bonusTiers.forEach((tier) => {
+                let isClaimed = claimedBonuses.includes(tier.count);
+                let progress = Math.min(validReferrals, tier.count);
+                let percent = (progress / tier.count) * 100;
+                let canClaim = (validReferrals >= tier.count) && !isClaimed;
+
+                let btnClass = "btn-unfinished";
+                let btnText = "Unfinished";
+                let btnAction = "";
+
+                if(isClaimed) {
+                    btnClass = "btn-unfinished";
+                    btnText = "Received";
+                } else if (canClaim) {
+                    btnClass = "btn-finish";
+                    btnText = "To receive";
+                    btnAction = `onclick="claimBonus(${tier.count}, ${tier.reward})"`;
+                }
+
+                let iconClass = tier.count >= 10 ? "fas fa-users" : (tier.count >= 3 ? "fas fa-user-friends" : "fas fa-user-plus");
+
+                html += `
+                <div class="bonus-card">
+                    <div class="bc-title"><i class="${iconClass}"></i> Invite ${tier.count} friends</div>
+                    <div class="info-row"><span class="info-lbl">Recharge amount</span><span class="info-val">₹300.00</span></div>
+                    <div class="info-row"><span class="info-lbl">Bonus</span><span class="info-val highlight">₹${tier.reward.toLocaleString('en-IN')}.00</span></div>
+                    <div class="progress-box">
+                        <div class="p-bar-bg"><div class="p-bar-fill" style="width: ${percent}%;"></div></div>
+                        <div class="p-text">${progress}/${tier.count}</div>
+                    </div>
+                    <button class="btn-status ${btnClass}" ${btnAction}>${btnText}</button>
+                </div>`;
+            });
+
+            document.getElementById("cardsContainer").innerHTML = html;
+        }
+
+        // 🚨 4. CLAIM BONUS LOGIC (CLOUD SECURE) 🚨
+        window.claimBonus = function(targetCount, rewardAmt) {
+            if(!userDocId) return alert("Syncing data... please wait.");
+
+            fireDB.collection("users").doc(userDocId).update({
+                balance: firebase.firestore.FieldValue.increment(rewardAmt),
+                claimedInviteBonuses: firebase.firestore.FieldValue.arrayUnion(targetCount)
+            }).then(() => {
+                // Update local wallet balance immediately for UI sync
+                let curBal = Number(localStorage.getItem('r_bal') || 0);
+                localStorage.setItem('r_bal', curBal + rewardAmt);
+                
+                alert("✅ Bonus of ₹" + rewardAmt.toLocaleString('en-IN') + " has been added to your balance!");
+            }).catch((err) => {
+                alert("Error claiming bonus: " + err.message);
+            });
+        }
+
+        window.onload = syncInvitationData;
+    </script>
+</body>
+</html>

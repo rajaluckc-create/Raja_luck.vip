@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Betting Records - Raja Luck VIP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f5f5f9; color: #333; padding-bottom: 30px; }
+
+        /* HEADER */
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; }
+        .header i { position: absolute; left: 15px; font-size: 20px; cursor: pointer; padding: 5px; }
+        .header-title { font-size: 18px; font-weight: bold; }
+
+        /* TABS */
+        .tabs-wrapper { background: white; padding: 10px 15px; display: flex; gap: 10px; overflow-x: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .tabs-wrapper::-webkit-scrollbar { display: none; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 20px; border-radius: 8px; font-size: 12px; font-weight: bold; color: #a4b0be; min-width: 80px; cursor: pointer;}
+        .tab-item i { font-size: 20px; margin-bottom: 5px; }
+        .tab-item.active { background: #6c5ce7; color: white; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
+
+        /* FILTERS */
+        .filters { display: flex; gap: 10px; padding: 15px; }
+        .filter-btn { flex: 1; background: white; padding: 12px 15px; border-radius: 8px; font-size: 12px; font-weight: bold; color: #747d8c; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f1f2f6; }
+        
+        /* RECORD CARD */
+        .record-card { background: white; margin: 0 15px 15px; border-radius: 12px; padding: 20px 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #3b236d; }
+        
+        .card-header { text-align: center; margin-bottom: 20px; }
+        .game-title { font-size: 16px; font-weight: 900; color: #2f3542; }
+        .win-status { font-weight: bold; }
+        .win-status.lost { color: #ff4757; }
+        .win-status.won { color: #2ed573; }
+        .date-time { font-size: 11px; color: #a4b0be; margin-top: 5px; }
+
+        /* TIMELINE LIST */
+        .timeline { position: relative; padding-left: 15px; margin-bottom: 20px; }
+        .timeline::before { content: ''; position: absolute; left: 4px; top: 5px; bottom: 0; width: 0px; border-left: 1px dashed #ffcad1; }
+        
+        .tl-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; position: relative; }
+        .tl-item::before { content: ''; position: absolute; left: -15px; top: 4px; width: 8px; height: 8px; background: white; border: 2px solid #ff6b81; border-radius: 50%; z-index: 2; }
+        
+        .tl-label { font-size: 12px; color: #747d8c; }
+        .tl-value { font-size: 13px; font-weight: bold; color: #2f3542; }
+        .tl-value.red { color: #ff4757; }
+        .tl-value.green { color: #2ed573; }
+
+        /* DASHED DIVIDER */
+        .divider { border-top: 1px dashed #dfe4ea; margin: 20px 0; }
+
+        /* LOTTERY RESULTS */
+        .result-row { display: flex; align-items: center; gap: 10px; position: relative; padding-left: 15px; margin-bottom: 20px; }
+        .result-row::before { content: ''; position: absolute; left: 4px; top: 5px; width: 8px; height: 8px; background: white; border: 2px solid #ff6b81; border-radius: 50%; z-index: 2; }
+        
+        .res-label { font-size: 13px; color: #2f3542; }
+        .res-number { font-size: 18px; font-weight: 900; margin-left: 10px; }
+        .res-size { font-size: 11px; font-weight: bold; color: #f1c40f; border: 1px solid #f1c40f; padding: 2px 8px; border-radius: 4px; }
+        
+        /* 4-GRID AMOUNTS */
+        .amount-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .amt-box { background: #f8f9fa; border-radius: 8px; padding: 15px 10px; text-align: center; border: 1px solid #f1f2f6; }
+        .amt-val { font-size: 15px; font-weight: 900; color: #2f3542; margin-bottom: 5px; }
+        .amt-val.red { color: #ff4757; }
+        .amt-val.green { color: #2ed573; }
+        .amt-label { font-size: 11px; color: #747d8c; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="window.history.back()"></i>
+        <div class="header-title">Betting records</div>
+    </div>
+
+    <div class="tabs-wrapper">
+        <div class="tab-item active"><i class="fas fa-gem"></i>लॉटरी</div>
+        <div class="tab-item"><i class="fas fa-tv"></i>रहना</div>
+        <div class="tab-item"><i class="fas fa-fish"></i>फ़िशिंग</div>
+        <div class="tab-item"><i class="fas fa-chess-knight"></i>शतरंज</div>
+    </div>
+
+    <div class="filters">
+        <div class="filter-btn">
+            <div><i class="fas fa-filter" style="margin-right:5px; color:#6c5ce7;"></i> Choose a type <br><strong style="color:#2f3542; font-size:14px; margin-top:3px; display:block;">WIN GO</strong></div>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="filter-btn">
+            <div><i class="far fa-calendar-alt" style="margin-right:5px; color:#6c5ce7;"></i> date selection</div>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+
+    <div id="recordsContainer">
+
+        <div class="record-card">
+            <div class="card-header">
+                <div class="game-title">WIN GO <span class="win-status won">जीता</span></div>
+                <div class="date-time">2026-05-09 10:15:30</div>
+            </div>
+            <div class="timeline">
+                <div class="tl-item"><span class="tl-label">Type</span><span class="tl-value">Win Go 30s</span></div>
+                <div class="tl-item"><span class="tl-label">Issue</span><span class="tl-value">20260509301245</span></div>
+                <div class="tl-item"><span class="tl-label">Order number</span><span class="tl-value">WG202605091015301245</span></div>
+                <div class="tl-item"><span class="tl-label">Bet selection</span><span class="tl-value green">Green</span></div>
+                <div class="tl-item"><span class="tl-label">Bet amount</span><span class="tl-value">₹100.00</span></div>
+            </div>
+            <div class="divider"></div>
+            <div class="result-row">
+                <span class="res-label">Lottery results</span>
+                <span class="res-number" style="color:#2ed573;">3</span>
+                <span class="res-size">Small</span>
+            </div>
+            <div class="amount-grid">
+                <div class="amt-box"><div class="amt-val">₹98.00</div><div class="amt-label">Actual amount</div></div>
+                <div class="amt-box"><div class="amt-val green">₹196.00</div><div class="amt-label">Total Payout</div></div>
+                <div class="amt-box"><div class="amt-val">₹2.00</div><div class="amt-label">Service Fee</div></div>
+                <div class="amt-box"><div class="amt-val green">+₹96.00</div><div class="amt-label">Profit and loss</div></div>
+            </div>
+        </div>
+
+        <div class="record-card">
+            <div class="card-header">
+                <div class="game-title">WIN GO <span class="win-status lost">नहीं जीता</span></div>
+                <div class="date-time">2026-05-09 09:20:10</div>
+            </div>
+            <div class="timeline">
+                <div class="tl-item"><span class="tl-label">Type</span><span class="tl-value">Win Go 30s</span></div>
+                <div class="tl-item"><span class="tl-label">Issue</span><span class="tl-value">20260509301112</span></div>
+                <div class="tl-item"><span class="tl-label">Order number</span><span class="tl-value">WG202605090920108871</span></div>
+                <div class="tl-item"><span class="tl-label">Bet selection</span><span class="tl-value red">4</span></div>
+                <div class="tl-item"><span class="tl-label">Bet amount</span><span class="tl-value">₹50.00</span></div>
+            </div>
+            <div class="divider"></div>
+            <div class="result-row">
+                <span class="res-label">Lottery results</span>
+                <span class="res-number" style="color:#ff4757;">6</span>
+                <span class="res-size">Big</span>
+            </div>
+            <div class="amount-grid">
+                <div class="amt-box"><div class="amt-val">₹49.00</div><div class="amt-label">Actual amount</div></div>
+                <div class="amt-box"><div class="amt-val">₹0.00</div><div class="amt-label">Total Payout</div></div>
+                <div class="amt-box"><div class="amt-val">₹1.00</div><div class="amt-label">Service Fee</div></div>
+                <div class="amt-box"><div class="amt-val red">-₹50.00</div><div class="amt-label">Profit and loss</div></div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
