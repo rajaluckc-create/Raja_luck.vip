@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Promotion - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* ORIGINAL CSS - NO CHANGES */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f7f8fc; color: #333; padding-bottom: 90px; overflow-x: hidden; }
+        .top-bg { background: linear-gradient(135deg, #2b1b4d, #482a7e); padding-bottom: 40px; border-radius: 0 0 20px 20px; position: relative; }
+        .header { padding: 15px; display: flex; align-items: center; justify-content: center; color: white; position: relative; }
+        .header-title { font-size: 18px; font-weight: bold; }
+        .head-icon { position: absolute; right: 15px; width: 35px; height: 35px; background: rgba(255,107,129,0.2); color: #ff6b81; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .subtitle { text-align: center; color: #dcdde1; font-size: 12px; margin-top: 5px; margin-bottom: 15px; }
+        .container { padding: 0 15px; position: relative; z-index: 10; margin-top: -10px;}
+        .comm-card { background: #2c254a; border-radius: 15px; padding: 20px; color: white; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .cc-title { font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;}
+        .cc-title i { color: #ff4757; font-size: 16px; }
+        .cc-grid { display: grid; grid-template-columns: 1fr 1fr; text-align: center; position: relative; }
+        .cc-grid::after { content: ''; position: absolute; width: 1px; height: 80%; background: rgba(255,255,255,0.1); left: 50%; top: 10%; }
+        .cc-val { font-size: 26px; font-weight: 900; margin-bottom: 5px; }
+        .cc-val.yellow { color: #f1c40f; }
+        .cc-val.green { color: #2ed573; }
+        .cc-label { font-size: 11px; color: #a4b0be; display: flex; align-items: center; justify-content: center; gap: 4px;}
+        .social-row { display: flex; justify-content: space-around; background: white; border-radius: 15px; padding: 20px 10px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .social-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 11px; font-weight: bold; color: #3b236d; cursor: pointer; }
+        .social-icon { width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; }
+        .bg-wa { background: #25D366; }
+        .bg-tg { background: #0088cc; }
+        .bg-sv { background: #634832; }
+        .bg-cp { background: #27ae60; }
+        .btn-share { width: 100%; background: linear-gradient(135deg, #ff9f43, #ff7f50); color: white; border: none; padding: 16px; border-radius: 30px; font-size: 16px; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(255, 127, 80, 0.3); }
+        .invite-box { background: #1a103c; border-radius: 15px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-left: 4px solid #f1c40f; }
+        .inv-left h4 { font-size: 10px; color: #a4b0be; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: flex; align-items: center; gap: 5px;}
+        .inv-left h4 i { color: #f1c40f; font-size: 14px;}
+        .inv-code { font-size: 24px; font-weight: 900; color: #f1c40f; letter-spacing: 2px; }
+        .copy-icon { font-size: 24px; color: #f1c40f; cursor: pointer; padding: 10px; }
+        .slider-banner { background: white; border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-left: 4px solid #8b3cff; }
+        .slider-icon { font-size: 24px; color: #8b3cff; }
+        .slider-txt h4 { font-size: 14px; color: #2f3542; margin-bottom: 3px; }
+        .slider-txt p { font-size: 11px; color: #a4b0be; }
+        .four-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 15px; }
+        .fg-item { background: #6c5ce7; border-radius: 12px; padding: 15px 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: white; text-align: center; cursor: pointer; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.2); transition: 0.2s; }
+        .fg-item:active { transform: scale(0.95); }
+        .fg-icon { width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #ff7979;}
+        .fg-text { font-size: 11px; font-weight: bold; line-height: 1.2;}
+        .promo-data { background: #5f4b8b; border-radius: 15px; padding: 20px; color: white; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(95, 75, 139, 0.3); }
+        .pd-header { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: bold; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .pd-header i { color: #ff6b81; font-size: 18px; }
+        .pd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 10px; text-align: center; }
+        .pd-val { font-size: 20px; font-weight: 900; color: #f1c40f; margin-bottom: 5px; }
+        .pd-val.white { color: white; font-size: 18px;}
+        .pd-label { font-size: 11px; color: #dcdde1; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; align-items: center; height: 65px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; border-radius: 20px 20px 0 0;}
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #a4b0be; text-decoration: none; width: 20%; gap: 4px; cursor: pointer;}
+        .nav-item.active { color: #ff4757; }
+        .nav-item i { font-size: 22px; }
+        .nav-center { position: relative; }
+        .nav-center .circle { width: 60px; height: 60px; background: linear-gradient(135deg, #ff9f43, #ff4757); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -30px; left: 50%; transform: translateX(-50%); border: 4px solid #f7f8fc; box-shadow: 0 4px 10px rgba(255,71,87,0.3); color: white; font-size: 28px; }
+        .nav-center span { margin-top: 32px; display: block; color: #a4b0be; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bg">
+        <div class="header">
+            <div class="header-title">Promotion</div>
+            <div class="head-icon"><i class="fas fa-money-bag"></i></div>
+        </div>
+        <div class="subtitle">Raise the level to increase commission income</div>
+    </div>
+
+    <div class="container">
+        
+        <div class="comm-card">
+            <div class="cc-title"><i class="fas fa-users"></i> Number of teams/Total commission</div>
+            <div class="cc-grid">
+                <div>
+                    <div class="cc-val yellow">0.00</div>
+                    <div class="cc-label">Total commission yesterday</div>
+                </div>
+                <div>
+                    <div class="cc-val green" id="totalCommission">0.00</div>
+                    <div class="cc-label"><i class="far fa-question-circle"></i> My overall earnings</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="social-row">
+            <div class="social-btn" onclick="shareSocial('whatsapp')">
+                <div class="social-icon bg-wa"><i class="fab fa-whatsapp"></i></div>WhatsApp
+            </div>
+            <div class="social-btn" onclick="shareSocial('telegram')">
+                <div class="social-icon bg-tg"><i class="fab fa-telegram-plane"></i></div>Telegram
+            </div>
+            <div class="social-btn" onclick="alert('QR Code Saved!')">
+                <div class="social-icon bg-sv"><i class="fas fa-save"></i></div>Save
+            </div>
+            <div class="social-btn" onclick="copyLink()">
+                <div class="social-icon bg-cp"><i class="fas fa-link"></i></div>Copy Link
+            </div>
+        </div>
+
+        <button class="btn-share" onclick="shareLink()">
+            <i class="fas fa-share-alt"></i> Share with a friend <i class="fas fa-chevron-right" style="margin-left:auto;"></i>
+        </button>
+
+        <div class="invite-box">
+            <div class="inv-left">
+                <h4><i class="fas fa-gift"></i> COPY INVITATION CODE</h4>
+                <div class="inv-code" id="myInviteCode">LOADING...</div>
+            </div>
+            <div class="copy-icon" onclick="copyCode()">
+                <i class="far fa-copy"></i>
+            </div>
+        </div>
+
+        <div class="slider-banner">
+            <div class="slider-icon"><i class="fas fa-users-cog"></i></div>
+            <div class="slider-txt">
+                <h4>Team Level 1-3 WinGo Turnover Salary</h4>
+                <p>Earn Salary from Team Turnover</p>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#dcdde1; margin-left:auto;"></i>
+        </div>
+
+        <div class="four-grid">
+            <div class="fg-item" onclick="window.location.href='team_report.html'">
+                <div class="fg-icon"><i class="fas fa-users"></i></div>
+                <div class="fg-text">team report</div>
+            </div>
+            <div class="fg-item" onclick="window.location.href='new_subordinates.html'">
+                <div class="fg-icon"><i class="fas fa-user-plus"></i></div>
+                <div class="fg-text">New subordinates</div>
+            </div>
+            <div class="fg-item" onclick="window.location.href='commission_detail.html'">
+                <div class="fg-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                <div class="fg-text">commission detail</div>
+            </div>
+            <div class="fg-item" onclick="window.location.href='invitation_rules.html'">
+                <div class="fg-icon"><i class="fas fa-book"></i></div>
+                <div class="fg-text">invitation rules</div>
+            </div>
+        </div>
+
+        <div class="promo-data">
+            <div class="pd-header"><i class="fas fa-database"></i> Promotion Data</div>
+            <div class="pd-grid">
+                <div>
+                    <div class="pd-val">0.00</div>
+                    <div class="pd-label">Total commission for the week</div>
+                </div>
+                <div>
+                    <div class="pd-val" id="bottomTotalComm">0.00</div>
+                    <div class="pd-label">Total commission</div>
+                </div>
+                <div>
+                    <div class="pd-val white" id="directSubs">0</div>
+                    <div class="pd-label">Direct Subordinate</div>
+                </div>
+                <div>
+                    <div class="pd-val white">0</div>
+                    <div class="pd-label">Total Subordinates</div>
+                </div>
+                <div>
+                    <div class="pd-val white">0</div>
+                    <div class="pd-label">Level 1 Depositors</div>
+                </div>
+                <div>
+                    <div class="pd-val white">0</div>
+                    <div class="pd-label">Team Depositors</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="window.location.href='index.html'">
+            <i class="fas fa-home"></i><span>Home</span>
+        </div>
+        <div class="nav-item" onclick="window.location.href='activity.html'">
+            <i class="fas fa-gift"></i><span>Activity</span>
+        </div>
+        <div class="nav-item nav-center" onclick="window.location.href='get_money.html'">
+            <div class="circle"><i class="fas fa-coins"></i></div>
+            <span>Get Money</span>
+        </div>
+        <div class="nav-item active" onclick="window.location.href='promote.html'">
+            <i class="fas fa-gem"></i><span>Promote</span>
+        </div>
+        <div class="nav-item" onclick="window.location.href='my.html'">
+            <i class="fas fa-user"></i><span>My</span>
+        </div>
+    </div>
+
+    <script>
+        // 🚨 1. FIREBASE SETUP 🚨
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var fireDB = firebase.firestore();
+
+        var userUid = localStorage.getItem("r_uid");
+        var userDocId = "";
+        var myCode = "";
+        var myPromoteLink = "";
+
+        // 🚨 2. LOAD & SYNC PROMOTION DATA 🚨
+        function loadPromotionData() {
+            if(!userUid) {
+                document.getElementById("myInviteCode").innerText = "LOGIN REQUIRED";
+                return;
+            }
+
+            fireDB.collection("users").where("uid", "==", parseInt(userUid)).get().then((snapshot) => {
+                if(!snapshot.empty) {
+                    snapshot.forEach((doc) => {
+                        userDocId = doc.id;
+                        var data = doc.data();
+                        
+                        // 1. Sync Invite Code
+                        if(data.inviteCode) {
+                            myCode = data.inviteCode;
+                            setupLinks();
+                        } else {
+                            // Generate new code and save permanently to Firebase
+                            myCode = generateCode();
+                            fireDB.collection("users").doc(userDocId).update({
+                                inviteCode: myCode
+                            }).then(() => setupLinks());
+                        }
+
+                        // 2. Sync Optional Stats (If available in Firebase later)
+                        var totalComm = data.totalCommission || 0;
+                        document.getElementById("totalCommission").innerText = totalComm.toFixed(2);
+                        document.getElementById("bottomTotalComm").innerText = totalComm.toFixed(2);
+                        document.getElementById("directSubs").innerText = data.referralCount || 0;
+                    });
+                }
+            });
+        }
+
+        function generateCode() {
+            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            var code = '';
+            for (var i = 0; i < 10; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        function setupLinks() {
+            document.getElementById("myInviteCode").innerText = myCode;
+            localStorage.setItem("r_my_invite_code", myCode);
+            // 🚨 GITHUB URL UPDATED HERE 🚨
+            myPromoteLink = "https://rajaluckc-create.github.io/Raja_luck.vip/register.html?invite=" + myCode;
+        }
+
+        function copyCode() {
+            if(!myCode) return;
+            navigator.clipboard.writeText(myCode);
+            alert("✅ Invitation Code Copied: " + myCode);
+        }
+
+        function copyLink() {
+            if(!myPromoteLink) return;
+            navigator.clipboard.writeText(myPromoteLink);
+            alert("✅ Promotion Link Copied!\n" + myPromoteLink);
+        }
+
+        function shareSocial(app) {
+            alert("This will open " + app + " to share your link when app is live!");
+        }
+
+        function shareLink() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Join Raja Luck VIP',
+                    text: 'Play games and earn money with me! Use my invite code: ' + myCode,
+                    url: myPromoteLink
+                }).catch(console.error);
+            } else {
+                copyLink();
+            }
+        }
+
+        window.onload = loadPromotionData;
+    </script>
+</body>
+</html>

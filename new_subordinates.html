@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>New Subordinates - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f8f9fc; color: #333; height: 100vh; display: flex; flex-direction: column; }
+
+        /* HEADER */
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; height: 60px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+        .back-btn { position: absolute; left: 15px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .header-title { font-size: 18px; font-weight: bold; }
+
+        /* TABS WRAPPER */
+        .tabs-wrapper { padding: 15px; }
+        .tabs-container { display: flex; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.03); padding: 5px; }
+        
+        .tab { flex: 1; text-align: center; padding: 12px 0; font-size: 13px; font-weight: bold; color: #a4b0be; cursor: pointer; border-radius: 8px; transition: 0.3s; position: relative;}
+        
+        /* ACTIVE TAB */
+        .tab.active { background: #6c5ce7; color: white; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
+        .tab.active::before { content: ''; display: inline-block; width: 6px; height: 6px; background: #f6c745; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+
+        /* EMPTY STATE (NO DATA) */
+        .empty-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 20vh; }
+        .empty-icon { font-size: 80px; color: #dcdde1; margin-bottom: 15px; }
+        .empty-text { font-size: 14px; color: #a4b0be; font-weight: bold; }
+
+        /* LIST CONTAINER */
+        .data-list { display: none; padding: 0 15px; overflow-y: auto; padding-bottom: 30px;}
+        
+        /* SUBORDINATE CARD */
+        .sub-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #6c5ce7; }
+        .sub-info h4 { font-size: 14px; color: #2f3542; margin-bottom: 4px; font-weight: 900;}
+        .sub-info p { font-size: 11px; color: #a4b0be; font-weight: bold; display: flex; align-items: center; gap: 5px;}
+        .sub-stats { text-align: right; }
+        .sub-badge { font-size: 10px; background: #f0edff; color: #6c5ce7; padding: 3px 8px; border-radius: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; display: inline-block;}
+        .sub-date { font-size: 10px; color: #a4b0be; font-weight: bold;}
+        
+        .loading-text { text-align: center; padding: 30px; font-weight: bold; color: #6c5ce7; width: 100%;}
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="back-btn" onclick="window.history.back()">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="header-title">New Subordinates</div>
+    </div>
+
+    <div class="tabs-wrapper">
+        <div class="tabs-container">
+            <div class="tab active" onclick="switchTab(this, 'today')">Today</div>
+            <div class="tab" onclick="switchTab(this, 'yesterday')">Yesterday</div>
+            <div class="tab" onclick="switchTab(this, 'month')">This Month</div>
+        </div>
+    </div>
+
+    <div class="empty-area" id="emptyState">
+        <div class="loading-text" id="loadMsg"><i class="fas fa-spinner fa-spin"></i> Fetching Data...</div>
+    </div>
+
+    <div class="data-list" id="userList">
+        </div>
+
+    <script>
+        // 🚨 1. FIREBASE SETUP 🚨
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var fireDB = firebase.firestore();
+
+        var myInviteCode = localStorage.getItem("r_my_invite_code");
+        var allSubordinates = [];
+
+        // 🚨 2. FETCH ALL DIRECT SUBORDINATES 🚨
+        async function loadSubordinates() {
+            if(!myInviteCode) {
+                showEmpty("Invite Code missing. Please login again.");
+                return;
+            }
+
+            try {
+                // Fetching only direct subordinates (Level 1) who used this invite code
+                const snapshot = await fireDB.collection("users").where("invitedByCode", "==", myInviteCode).get();
+                
+                allSubordinates = snapshot.docs.map(doc => doc.data());
+                
+                // Once loaded, trigger the "Today" tab automatically
+                let activeTab = document.querySelector('.tab.active');
+                switchTab(activeTab, 'today');
+
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+                showEmpty("Network Error. Please try again.");
+            }
+        }
+
+        // 🚨 3. FILTER BY DATE 🚨
+        function switchTab(clickedTab, timeframe) {
+            // UI Tab Switch
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            clickedTab.classList.add('active');
+
+            let filteredList = [];
+            let today = new Date();
+
+            allSubordinates.forEach(user => {
+                if(!user.createdAt) return; // Skip if no creation date
+                
+                // Convert Firebase Timestamp to JS Date
+                let regDate = user.createdAt.toDate ? user.createdAt.toDate() : new Date(user.createdAt);
+
+                if(timeframe === 'today') {
+                    if(regDate.toDateString() === today.toDateString()) {
+                        filteredList.push({user, regDate});
+                    }
+                } 
+                else if (timeframe === 'yesterday') {
+                    let yesterday = new Date(today);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    if(regDate.toDateString() === yesterday.toDateString()) {
+                        filteredList.push({user, regDate});
+                    }
+                } 
+                else if (timeframe === 'month') {
+                    if(regDate.getMonth() === today.getMonth() && regDate.getFullYear() === today.getFullYear()) {
+                        filteredList.push({user, regDate});
+                    }
+                }
+            });
+
+            // Sort by newest first
+            filteredList.sort((a, b) => b.regDate - a.regDate);
+            renderList(filteredList);
+        }
+
+        // 🚨 4. RENDER UI 🚨
+        function renderList(list) {
+            let listContainer = document.getElementById('userList');
+            let emptyState = document.getElementById('emptyState');
+
+            if(list.length === 0) {
+                showEmpty("No data");
+                listContainer.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                listContainer.style.display = 'block';
+                
+                let html = "";
+                list.forEach(item => {
+                    let u = item.user;
+                    let dateStr = item.regDate.toLocaleDateString(); // e.g. "5/12/2026"
+                    let maskedPhone = u.mobile ? u.mobile.substring(0,3) + "****" + u.mobile.substring(7) : "Unknown";
+                    
+                    html += `
+                        <div class="sub-card">
+                            <div class="sub-info">
+                                <h4>UID: ${u.uid || 'N/A'}</h4>
+                                <p><i class="fas fa-mobile-alt"></i> ${maskedPhone}</p>
+                            </div>
+                            <div class="sub-stats">
+                                <div class="sub-badge">New Member</div>
+                                <div class="sub-date">${dateStr}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                listContainer.innerHTML = html;
+            }
+        }
+
+        function showEmpty(msg) {
+            let emptyState = document.getElementById('emptyState');
+            emptyState.innerHTML = `
+                <i class="fas fa-box-open empty-icon"></i>
+                <div class="empty-text">${msg}</div>
+            `;
+            emptyState.style.display = 'flex';
+            document.getElementById('userList').style.display = 'none';
+        }
+
+        // Start process on load
+        window.onload = loadSubordinates;
+    </script>
+</body>
+</html>

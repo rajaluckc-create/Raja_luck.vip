@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Team Report - Raja Luck</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* ORIGINAL DESIGN - NO CHANGES */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f5f5f9; color: #333; padding-bottom: 30px; }
+
+        .header { background: #3b236d; padding: 15px; display: flex; align-items: center; justify-content: center; position: sticky; top: 0; z-index: 100; color: white; height: 60px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+        .back-btn { position: absolute; left: 15px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .header-title { font-size: 18px; font-weight: bold; }
+
+        .container { padding: 15px; }
+
+        .search-box { display: flex; background: white; border-radius: 30px; padding: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 15px; align-items: center;}
+        .search-input { flex: 1; border: none; padding: 10px 15px; font-size: 14px; outline: none; background: transparent;}
+        .search-input::placeholder { color: #a4b0be; }
+        .search-btn { background: linear-gradient(135deg, #ff7f50, #ff4757); color: white; border: none; width: 40px; height: 35px; border-radius: 20px; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(255, 71, 87, 0.3); margin-right: 5px;}
+
+        .filter-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .filter-item { flex: 1; background: white; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #f1f2f6; position: relative;}
+        .filter-icon { color: #6c5ce7; font-size: 16px; }
+        .filter-text { flex: 1; display: flex; flex-direction: column; }
+        .filter-label { font-size: 10px; color: #a4b0be; margin-bottom: 2px; }
+        
+        .filter-select, .filter-date { border: none; background: transparent; font-size: 14px; font-weight: bold; color: #2f3542; outline: none; width: 100%; -webkit-appearance: none; cursor: pointer;}
+        .filter-item::after { content: '\f107'; font-family: 'Font Awesome 5 Free'; font-weight: 900; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #a4b0be; font-size: 12px; pointer-events: none;}
+
+        .stats-card { background: #6c5ce7; border-radius: 12px; padding: 20px 10px; display: flex; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3); }
+        .stats-col { flex: 1; display: flex; flex-direction: column; gap: 15px; text-align: center; }
+        .stats-col:first-child { border-right: 1px solid rgba(255,255,255,0.1); }
+        
+        .stat-box { display: flex; flex-direction: column; gap: 5px; }
+        .stat-val { font-size: 20px; font-weight: 900; color: #f1c40f; }
+        .stat-lbl { font-size: 11px; color: #d0c9f1; }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: #a4b0be; margin-top: 20px; }
+        .empty-state i { font-size: 60px; margin-bottom: 15px; opacity: 0.3; color: #a4b0be;}
+        .empty-state p { font-size: 14px; font-weight: bold; color: #a4b0be; }
+
+        /* 🚨 NEW: PLAYER LIST CARD DESIGN 🚨 */
+        .user-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #6c5ce7; }
+        .uc-info h4 { font-size: 14px; color: #2f3542; margin-bottom: 4px; font-weight: 900;}
+        .uc-info p { font-size: 11px; color: #a4b0be; font-weight: bold; display: flex; align-items: center; gap: 5px;}
+        .uc-stats { text-align: right; }
+        .uc-dep { color: #2ed573; font-weight: 900; font-size: 16px; margin-bottom: 4px; }
+        .uc-lvl { font-size: 10px; background: #f0edff; color: #6c5ce7; padding: 3px 8px; border-radius: 10px; font-weight: bold; text-transform: uppercase;}
+        .loading-text { text-align: center; padding: 30px; font-weight: bold; color: #6c5ce7; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="back-btn" onclick="window.history.back()">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="header-title">Team Report</div>
+    </div>
+
+    <div class="container">
+        
+        <div class="search-box">
+            <input type="number" id="searchUid" class="search-input" placeholder="Search for subordinate UIDs">
+            <button class="search-btn" onclick="applyFilters()"><i class="fas fa-search"></i></button>
+        </div>
+
+        <div class="filter-row">
+            <div class="filter-item">
+                <i class="fas fa-bars filter-icon"></i>
+                <div class="filter-text">
+                    <span class="filter-label">downline level</span>
+                    <select class="filter-select" id="levelFilter" onchange="applyFilters()">
+                        <option value="All">All</option>
+                        <option value="1">Level 1</option>
+                        <option value="2">Level 2</option>
+                        <option value="3">Level 3</option>
+                        <option value="4">Level 4</option>
+                        <option value="5">Level 5</option>
+                        <option value="6">Level 6</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-item">
+                <i class="far fa-calendar-alt filter-icon"></i>
+                <div class="filter-text">
+                    <span class="filter-label">Select a date</span>
+                    <input type="date" class="filter-date" id="reportDate" onchange="applyFilters()">
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-card">
+            <div class="stats-col">
+                <div class="stat-box">
+                    <div class="stat-val" id="s_depositors">0</div>
+                    <div class="stat-lbl">Depositors</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val" id="s_bettors">0</div>
+                    <div class="stat-lbl">Bettors</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val" id="s_members">0</div>
+                    <div class="stat-lbl">Total Members</div>
+                </div>
+            </div>
+            
+            <div class="stats-col">
+                <div class="stat-box">
+                    <div class="stat-val" id="s_depAmt">₹0</div>
+                    <div class="stat-lbl">Deposit Amount</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val" id="s_betAmt">₹0</div>
+                    <div class="stat-lbl">Bet Amount</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-val" id="s_fDepAmt">₹0</div>
+                    <div class="stat-lbl">First Deposit Amount</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="teamList">
+            <div class="loading-text"><i class="fas fa-spinner fa-spin"></i> Fetching Team Data...</div>
+        </div>
+
+    </div>
+
+    <script>
+        // Set Today's Date automatically
+        window.onload = function() {
+            var dateInput = document.getElementById("reportDate");
+            var today = new Date();
+            var yyyy = today.getFullYear();
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
+            var dd = String(today.getDate()).padStart(2, '0');
+            dateInput.value = yyyy + '-' + mm + '-' + dd;
+            
+            // Start Loading Data
+            fetchTeamData();
+        };
+
+        // 🚨 FIREBASE SETUP 🚨
+        var firebaseConfig = { 
+            apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", 
+            authDomain: "ff-warzone-9c820.firebaseapp.com", 
+            projectId: "ff-warzone-9c820", 
+            storageBucket: "ff-warzone-9c820.firebasestorage.app", 
+            messagingSenderId: "267357764090", 
+            appId: "1:267357764090:web:0691111afd07cb0ff20c43" 
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var fireDB = firebase.firestore();
+
+        var myInviteCode = localStorage.getItem("r_my_invite_code");
+        var allTeamMembers = []; // Will store {level: 1, data: {...}}
+
+        // Helper function to split array into chunks of 10 for Firebase 'in' query
+        function chunkArray(myArray, chunk_size){
+            var results = [];
+            while (myArray.length) {
+                results.push(myArray.splice(0, chunk_size));
+            }
+            return results;
+        }
+
+        // 🚨 6-LEVEL DEEP FETCH ENGINE 🚨
+        async function fetchTeamData() {
+            if(!myInviteCode) {
+                document.getElementById("teamList").innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Invite code not found. Please login again.</p></div>`;
+                return;
+            }
+
+            let currentLevelCodes = [myInviteCode];
+            allTeamMembers = [];
+
+            try {
+                // Loop through 6 levels
+                for(let level = 1; level <= 6; level++) {
+                    if(currentLevelCodes.length === 0) break; // Stop if no one was invited in previous level
+                    
+                    let nextLevelCodes = [];
+                    let chunks = chunkArray([...currentLevelCodes], 10); // Firestore allows max 10 items in "in" query
+
+                    for(let chunk of chunks) {
+                        const snapshot = await fireDB.collection("users").where("invitedByCode", "in", chunk).get();
+                        snapshot.forEach(doc => {
+                            let data = doc.data();
+                            allTeamMembers.push({ level: level, data: data });
+                            
+                            // If this user has their own invite code, add it to find their subordinates (Next Level)
+                            if(data.inviteCode) {
+                                nextLevelCodes.push(data.inviteCode);
+                            }
+                        });
+                    }
+                    currentLevelCodes = nextLevelCodes; // Move to next level
+                }
+                
+                // Once all 6 levels are fetched, update the UI
+                applyFilters();
+
+            } catch (error) {
+                console.log("Error fetching team:", error);
+                document.getElementById("teamList").innerHTML = `<div class="empty-state"><i class="fas fa-wifi"></i><p>Network Error. Please refresh.</p></div>`;
+            }
+        }
+
+        // 🚨 FILTER & CALCULATE STATS 🚨
+        function applyFilters() {
+            let selectedLevel = document.getElementById("levelFilter").value;
+            let searchUid = document.getElementById("searchUid").value.trim();
+            // Note: Full Date filtering requires timestamp matching. For this version, we will filter UI by Level & UID.
+
+            let filteredTeam = allTeamMembers.filter(member => {
+                let matchLevel = (selectedLevel === "All" || member.level == selectedLevel);
+                let matchUid = (searchUid === "" || String(member.data.uid).includes(searchUid));
+                return matchLevel && matchUid;
+            });
+
+            // Calculate Stats
+            let depositors = 0, bettors = 0, depAmt = 0, betAmt = 0;
+
+            filteredTeam.forEach(member => {
+                let d = member.data;
+                let userDep = Number(d.totalDep || 0);
+                let userBet = Number(d.wagerDone || 0);
+
+                if(userDep > 0) depositors++;
+                if(userBet > 0) bettors++;
+                depAmt += userDep;
+                betAmt += userBet;
+            });
+
+            // Update Stats UI
+            document.getElementById("s_depositors").innerText = depositors;
+            document.getElementById("s_bettors").innerText = bettors;
+            document.getElementById("s_members").innerText = filteredTeam.length;
+            document.getElementById("s_depAmt").innerText = "₹" + depAmt.toFixed(2);
+            document.getElementById("s_betAmt").innerText = "₹" + betAmt.toFixed(2);
+            document.getElementById("s_fDepAmt").innerText = "₹" + depAmt.toFixed(2); // First dep assumed as total for lightweight system
+
+            // Render List
+            renderList(filteredTeam);
+        }
+
+        function renderList(list) {
+            let html = "";
+            if(list.length === 0) {
+                html = `<div class="empty-state"><i class="fas fa-box-open"></i><p>No team data found.</p></div>`;
+            } else {
+                list.forEach(member => {
+                    let d = member.data;
+                    let maskedPhone = d.mobile ? d.mobile.substring(0,3) + "****" + d.mobile.substring(7) : "Unknown";
+                    let totalD = (d.totalDep || 0).toFixed(2);
+                    let totalB = (d.wagerDone || 0).toFixed(2);
+                    
+                    html += `
+                        <div class="user-card">
+                            <div class="uc-info">
+                                <h4>UID: ${d.uid || "N/A"}</h4>
+                                <p><i class="fas fa-mobile-alt"></i> ${maskedPhone}</p>
+                                <p style="margin-top:4px; color:#8e44ad;"><i class="fas fa-gamepad"></i> Bet: ₹${totalB}</p>
+                            </div>
+                            <div class="uc-stats">
+                                <div class="uc-dep">₹${totalD}</div>
+                                <span class="uc-lvl">Level ${member.level}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById("teamList").innerHTML = html;
+        }
+    </script>
+</body>
+</html>
