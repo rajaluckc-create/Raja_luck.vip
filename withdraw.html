@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Withdraw - Raja Luck VIP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* 🚨 ORIGINAL DESIGN - NO CHANGES 🚨 */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f7f8fc; color: #333; padding-bottom: 80px; overflow-x: hidden; }
+        .header { background: linear-gradient(135deg, #6c5ce7, #a29bfe); padding: 15px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; color: white; box-shadow: 0 4px 10px rgba(108, 92, 231, 0.2); }
+        .header i { font-size: 20px; cursor: pointer; padding: 5px; }
+        .header-title { font-size: 18px; font-weight: 900; letter-spacing: 0.5px; }
+        .header-link { font-size: 12px; font-weight: bold; color: #fff; text-decoration: none; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 20px; }
+        .container { padding: 15px; }
+        .balance-card { background: linear-gradient(135deg, #141124, #2d3436); border-radius: 18px; padding: 25px 20px; color: #f1c40f; position: relative; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 1px solid #333;}
+        .bal-label { font-size: 11px; text-transform: uppercase; color: #a4b0be; margin-bottom: 5px; font-weight: bold; }
+        .bal-amount { font-size: 36px; font-weight: 900; color: #f6c745; margin-bottom: 15px; }
+        .wager-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .wager-text { font-size: 12px; color: #fff; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;}
+        .wager-text i { color: #f6c745; }
+        .progress-bg { width: 100%; height: 8px; background: #333; border-radius: 10px; overflow: hidden; margin-bottom: 8px;}
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff4757, #ff6b81); width: 0%; transition: 0.5s; }
+        .wager-alert { font-size: 11px; color: #ff4757; font-weight: bold; background: rgba(255, 71, 87, 0.1); padding: 8px; border-radius: 6px; text-align: center;}
+        
+        .sec-title { font-size: 14px; font-weight: 900; color: #2f3542; margin-bottom: 15px; display: flex; align-items: center; gap: 6px; }
+        .sec-title::before { content: ''; width: 4px; height: 14px; background: #6c5ce7; border-radius: 2px; }
+        
+        .method-container { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px;}
+        .method-card { min-width: 140px; background: white; border-radius: 12px; border: 2px solid #dfe4ea; padding: 15px; text-align: center; cursor: pointer; transition: 0.2s;}
+        .method-card.active { border-color: #6c5ce7; background: #f0edff; }
+        .method-icon { font-size: 24px; color: #6c5ce7; margin-bottom: 8px; }
+        .method-name { font-size: 12px; font-weight: bold; color: #2f3542; }
+        
+        .add-bank-btn { background: white; border: 2px dashed #6c5ce7; border-radius: 12px; padding: 15px; text-align: center; font-size: 13px; font-weight: bold; color: #6c5ce7; cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        .saved-account { background: linear-gradient(135deg, #f0edff, #e0dbf8); border: 1px solid #6c5ce7; border-radius: 12px; padding: 15px; margin-bottom: 20px; display: none; align-items: center; justify-content: space-between;}
+        .acc-info h4 { font-size: 14px; color: #2f3542; margin-bottom: 2px;}
+        .acc-info p { font-size: 11px; color: #6c5ce7; font-weight: bold;}
+        .bound-badge { background: #6c5ce7; color: white; padding: 4px 8px; border-radius: 20px; font-size: 10px; font-weight: bold; }
+
+        .input-box { background: white; border-radius: 12px; padding: 15px; margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; font-weight: bold; color: #747d8c; margin-bottom: 8px; }
+        .custom-input { display: flex; align-items: center; background: #f8f9fa; border: 1px solid #dfe4ea; border-radius: 10px; padding: 10px 15px; }
+        .custom-input span, .custom-input i { font-size: 18px; color: #6c5ce7; margin-right: 10px; }
+        .custom-input input { flex: 1; border: none; background: transparent; font-size: 16px; font-weight: bold; outline: none; }
+        .max-btn { font-size: 12px; color: #ff4757; font-weight: bold; cursor: pointer; padding-left: 10px; border-left: 1px solid #dfe4ea; }
+        
+        .btn-submit { width: 100%; background: linear-gradient(135deg, #6c5ce7, #a29bfe); color: white; border: none; padding: 18px; border-radius: 30px; font-size: 16px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
+        .btn-submit:disabled { background: #ced6e0; cursor: not-allowed; }
+        
+        .instruction-box { background: #fff0f1; border-radius: 12px; padding: 15px; margin-top: 20px; border: 1px dashed #ffcad1; }
+        .inst-title { font-size: 12px; font-weight: bold; color: #ff4757; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .inst-list { font-size: 11px; color: #747d8c; line-height: 1.6; padding-left: 15px; font-weight: 500; }
+        
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 200; align-items: flex-end; }
+        .modal-content { background: white; width: 100%; padding: 25px 20px; border-radius: 20px 20px 0 0; }
+        .modal-title { font-size: 16px; font-weight: 900; margin-bottom: 20px; text-align: center; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; align-items: center; height: 65px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; border-radius: 20px 20px 0 0;}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <i class="fas fa-chevron-left" onclick="window.location.href='my.html'"></i>
+        <div class="header-title">Withdraw</div>
+        <a href="withdraw_history.html" class="header-link">Records</a>
+    </div>
+
+    <div class="container">
+        <div class="balance-card">
+            <div class="bal-label">Available Balance</div>
+            <div class="bal-amount">₹ <span id="currentBal">0.00</span></div>
+            <div class="wager-box">
+                <div class="wager-text"><i class="fas fa-shield-alt"></i> 3X Wagering Status</div>
+                <div class="progress-bg"><div class="progress-fill" id="wagerBar"></div></div>
+                <div class="wager-alert" id="wagerAlert">Pending Wagering: ₹<span id="wagerRem">0.00</span></div>
+            </div>
+        </div>
+
+        <div class="sec-title" id="titleMethod">Select Method</div>
+        <div class="method-container" id="methodSelector">
+            <div class="method-card active" onclick="selectMethod('Bank')" id="cardBank"><div class="method-icon"><i class="fas fa-university"></i></div>Bank</div>
+            <div class="method-card" onclick="selectMethod('UPI')" id="cardUPI"><div class="method-icon"><i class="fas fa-mobile-alt"></i></div>UPI</div>
+        </div>
+
+        <div class="add-bank-btn" id="btnAddAcc" onclick="openModal()"><i class="fas fa-plus"></i> Add Withdrawal Account</div>
+
+        <div class="saved-account" id="savedAcc">
+            <div class="acc-info"><h4 id="dispAccName">Name</h4><p id="dispAccNo">No details</p></div>
+            <div class="bound-badge">Bound</div>
+        </div>
+
+        <div class="input-box">
+            <div class="input-group">
+                <label>Amount (₹)</label>
+                <div class="custom-input"><span>₹</span><input type="number" id="wdAmount" placeholder="Min ₹110"><div class="max-btn" onclick="setMax()">MAX</div></div>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <div class="custom-input"><i class="fas fa-lock"></i><input type="password" id="wdPass" placeholder="Enter Password"></div>
+            </div>
+        </div>
+
+        <button class="btn-submit" id="btnWithdraw" onclick="processWithdraw()" disabled>Loading...</button>
+
+        <div class="instruction-box">
+            <div class="inst-title"><i class="fas fa-list-ul"></i> Withdrawal Rules</div>
+            <ul class="inst-list">
+                <li>Minimum withdrawal is <b>₹110</b>.</li>
+                <li>Daily withdrawal limit: <b>3 times per day</b>.</li>
+                <li><b>Deposit Required:</b> You must make at least one deposit to unlock withdrawals.</li>
+                <li><b>3X Wagering:</b> You must bet 3x of your total deposited amount before withdrawing.</li>
+                <li>A <b>2% tax</b> fee will be deducted on every withdrawal.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="accModal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">Bind Bank Account</div>
+            <div id="bankForm">
+                <input type="text" id="bName" placeholder="Actual Name" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+                <input type="number" id="bAcc" placeholder="Account Number" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+                <input type="text" id="bIfsc" placeholder="IFSC Code" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+            </div>
+            <div id="upiForm" style="display:none;">
+                <input type="text" id="uName" placeholder="Actual Name" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+                <input type="text" id="uId" placeholder="UPI ID" style="width:100%; padding:12px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+            </div>
+            <button class="btn-submit" onclick="saveAccount()">Save & Bind</button>
+            <p onclick="closeModal()" style="text-align:center; margin-top:10px; color:#999; font-size:12px;">Cancel</p>
+        </div>
+    </div>
+
+    <script>
+        // 🚨 FIREBASE SETUP 🚨
+        var firebaseConfig = { apiKey: "AIzaSyA9a_UA1cbr7sx0G1lu90ig18DfEDvmvgk", authDomain: "ff-warzone-9c820.firebaseapp.com", projectId: "ff-warzone-9c820", storageBucket: "ff-warzone-9c820.firebasestorage.app", messagingSenderId: "267357764090", appId: "1:267357764090:web:0691111afd07cb0ff20c43" };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        var fireDB = firebase.firestore();
+
+        var bal = 0;
+        var totalDep = 0; // 🚨 NEW: To track deposit lock 🚨
+        var userDocId = "";
+        var hasAccount = false;
+        var savedPayoutDetails = "";
+
+        // 🚨 LIVE SYNC 🚨
+        function syncWithdrawPage() {
+            var userUid = localStorage.getItem("r_uid");
+            
+            if (!userUid || userUid === "null" || userUid === "undefined") {
+                window.location.href = "login.html";
+                return;
+            }
+
+            var uidToSearch = parseInt(userUid);
+
+            fireDB.collection("users").where("uid", "==", uidToSearch).onSnapshot((snapshot) => {
+                if (snapshot.empty) {
+                    fireDB.collection("users").where("uid", "==", userUid).get().then(s2 => {
+                        if(!s2.empty) updateWithdrawUI(s2.docs[0]);
+                    });
+                    return;
+                }
+
+                snapshot.forEach((doc) => {
+                    updateWithdrawUI(doc);
+                });
+            }, (error) => {
+                console.log("Sync Error:", error);
+            });
+        }
+
+        // UI अपडेट करने वाला फंक्शन
+        function updateWithdrawUI(doc) {
+            userDocId = doc.id;
+            var data = doc.data();
+            
+            // 1. Balance & Deposit Lock Check
+            bal = data.balance || 0;
+            totalDep = Number(data.totalDep || 0); // 🚨 CHECK TOTAL DEPOSIT 🚨
+            document.getElementById("currentBal").innerText = bal.toFixed(2);
+            localStorage.setItem('r_bal', bal);
+
+            // 2. Wagering Logic (X वाला लॉजिक)
+            var target = data.wagerTarget || 0;
+            var done = data.wagerDone || 0;
+            
+            var rem = target - done; 
+            if(rem < 0) rem = 0; 
+            
+            document.getElementById("wagerRem").innerText = rem.toFixed(2);
+            
+            var perc = 0;
+            if(target === 0 && done === 0) {
+                perc = 100; 
+            } else if (target > 0) {
+                perc = (done / target) * 100;
+            }
+            document.getElementById("wagerBar").style.width = Math.min(perc, 100) + "%";
+            
+            // 🚨 Button Control (Deposit Lock + Wagering Lock) 🚨
+            var btn = document.getElementById("btnWithdraw");
+            if(totalDep <= 0) {
+                btn.disabled = true;
+                btn.innerText = "Deposit to Unlock";
+            } else if(rem > 0) {
+                btn.disabled = true;
+                btn.innerText = "Wagering Incomplete";
+            } else {
+                btn.disabled = false;
+                btn.innerText = "Withdraw Now";
+            }
+
+            // 3. Bank Sync
+            if(data.bankDetails) {
+                displayBoundAccount(data.bankDetails);
+            }
+        }
+
+        function displayBoundAccount(acc) {
+            hasAccount = true; savedPayoutDetails = acc.payoutInfo;
+            document.getElementById("dispAccName").innerText = acc.name;
+            document.getElementById("dispAccNo").innerText = acc.displayNo;
+            document.getElementById("methodSelector").style.display = "none";
+            document.getElementById("titleMethod").style.display = "none";
+            document.getElementById("btnAddAcc").style.display = "none";
+            document.getElementById("savedAcc").style.display = "flex";
+        }
+
+        var currentMethod = 'Bank';
+        function selectMethod(m) {
+            currentMethod = m;
+            document.getElementById("cardBank").className = (m=='Bank'?'method-card active':'method-card');
+            document.getElementById("cardUPI").className = (m=='UPI'?'method-card active':'method-card');
+            document.getElementById("bankForm").style.display = (m=='Bank'?'block':'none');
+            document.getElementById("upiForm").style.display = (m=='UPI'?'block':'none');
+        }
+
+        function openModal() { document.getElementById("accModal").style.display = "flex"; }
+        function closeModal() { document.getElementById("accModal").style.display = "none"; }
+        function setMax() { document.getElementById("wdAmount").value = Math.floor(bal); }
+
+        function saveAccount() {
+            var acc = {};
+            if(currentMethod === 'Bank') {
+                var n = document.getElementById("bName").value, a = document.getElementById("bAcc").value, i = document.getElementById("bIfsc").value;
+                if(!n||!a||!i) return alert("Fill all details!");
+                acc = { name: n, displayNo: "**** " + a.slice(-4), payoutInfo: "Bank: "+a+" | IFSC: "+i+" | Name: "+n };
+            } else {
+                var n = document.getElementById("uName").value, u = document.getElementById("uId").value;
+                if(!n||!u) return alert("Fill all details!");
+                acc = { name: n, displayNo: u, payoutInfo: "UPI: "+u+" | Name: "+n };
+            }
+            fireDB.collection("users").doc(userDocId).update({ bankDetails: acc }).then(() => {
+                displayBoundAccount(acc); closeModal(); alert("Linked! ✅");
+            });
+        }
+
+        function processWithdraw() {
+            // 🚨 SECURE DEPOSIT CHECK 🚨
+            if(totalDep <= 0) return alert("⚠️ Please make your first deposit to unlock withdrawals!");
+
+            var amt = Number(document.getElementById("wdAmount").value);
+            if(!hasAccount) return alert("Bind Account First!");
+            if(amt < 110 || amt > bal) return alert("Check Amount!");
+            
+            document.getElementById("btnWithdraw").disabled = true;
+            document.getElementById("btnWithdraw").innerText = "Sending...";
+
+            var userUidStr = localStorage.getItem("r_uid");
+
+            fireDB.collection("users").doc(userDocId).update({ 
+                balance: firebase.firestore.FieldValue.increment(-amt) 
+            }).then(() => {
+                return fireDB.collection("withdraws").add({ 
+                    uid: parseInt(userUidStr), 
+                    amt: amt, 
+                    status: "Pending", 
+                    payoutInfo: savedPayoutDetails, 
+                    time: new Date().toLocaleString(), 
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+                });
+            }).then(() => {
+                alert("Withdrawal Requested Successfully! ✅"); window.location.href = "my.html";
+            }).catch(e => { alert(e.message); document.getElementById("btnWithdraw").disabled = false; });
+        }
+
+        window.onload = syncWithdrawPage;
+    </script>
+</body>
+</html>
